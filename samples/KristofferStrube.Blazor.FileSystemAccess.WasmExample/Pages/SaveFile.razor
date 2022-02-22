@@ -20,9 +20,22 @@ else
 
     protected async Task OpenFilePicker()
     {
-        FileHandle = await FileSystemAccessService.ShowSaveFilePickerAsync(new (suggestedName: "newFile.txt"));
-        var file = await FileHandle.GetFileAsync();
-        FileText = await file.TextAsync();
+        try
+        {
+            FileHandle = await FileSystemAccessService.ShowSaveFilePickerAsync(new (suggestedName: "newFile.txt"));
+        }
+        catch(JSException ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            if (FileHandle != null)
+            {
+                var file = await FileHandle.GetFileAsync();
+                FileText = await file.TextAsync();
+            }
+        }
     }
 
     protected async Task TextAreaChanged(ChangeEventArgs eventArgs)
