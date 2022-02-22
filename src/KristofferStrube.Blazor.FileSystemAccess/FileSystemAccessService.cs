@@ -4,26 +4,26 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 
 public class FileSystemAccessService : IAsyncDisposable
 {
-    private readonly Lazy<Task<IJSObjectReference>> moduleTask;
+    private readonly Lazy<Task<IJSInProcessObjectReference>> moduleTask;
     private readonly IJSRuntime jsRuntime;
 
     public FileSystemAccessService(IJSRuntime jsRuntime)
     {
-        moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
+        moduleTask = new(() => jsRuntime.InvokeAsync<IJSInProcessObjectReference>(
            "import", "./_content/KristofferStrube.Blazor.FileSystemAccess/KristofferStrube.Blazor.FileSystemAccess.js").AsTask());
         this.jsRuntime = jsRuntime;
     }
 
     public async Task<FileSystemFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptions openFilePickerOptions = default)
     {
-        var module = await moduleTask.Value;
+        var helper = await moduleTask.Value;
         var jSFileHandles = await jsRuntime.InvokeAsync<IJSObjectReference>("window.showOpenFilePicker", openFilePickerOptions);
-        var length = await module.InvokeAsync<int>("size", jSFileHandles);
+        var length = await helper.InvokeAsync<int>("size", jSFileHandles);
         return await Task.WhenAll(
             Enumerable
                 .Range(0, length)
                 .Select(async i =>
-                    new FileSystemFileHandle(await jSFileHandles.InvokeAsync<IJSObjectReference>("at", i))
+                    new FileSystemFileHandle(await jSFileHandles.InvokeAsync<IJSObjectReference>("at", i), helper)
                 )
                 .ToArray()
         );
@@ -31,8 +31,9 @@ public class FileSystemAccessService : IAsyncDisposable
 
     public async Task<FileSystemFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptions saveFilePickerOptions = default)
     {
+        var helper = await moduleTask.Value;
         var jSFileHandle = await jsRuntime.InvokeAsync<IJSObjectReference>("window.showSaveFilePicker", saveFilePickerOptions);
-        return new FileSystemFileHandle(jSFileHandle);
+        return new FileSystemFileHandle(jSFileHandle, helper);
     }
 
 

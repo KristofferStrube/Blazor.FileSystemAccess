@@ -33,6 +33,9 @@ else
         {
             if (FileHandle != null)
             {
+                Console.WriteLine($"Name: {FileHandle.Name}");
+                Console.WriteLine($"Kind: {FileHandle.Kind}");
+                Console.WriteLine($"Is Same as Self: {await FileHandle.IsSameEntryAsync(FileHandle)}");
                 var file = await FileHandle.GetFileAsync();
                 FileText = await file.TextAsync();
             }
