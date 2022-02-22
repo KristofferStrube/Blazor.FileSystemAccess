@@ -15,7 +15,7 @@ jobs:
         - uses: actions/checkout@v2
 
         # Install .NET 6.0 SDK
-        - name: Setup .NET .NET 6 preview
+        - name: Setup .NET 6 preview
           uses: actions/setup-dotnet@v1
           with:
             dotnet-version: '6.0.x'
