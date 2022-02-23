@@ -1,5 +1,5 @@
 # Blazor.FileSystemAccess
-A Blazor wrapper for the JavaScript API [File System Access](https://wicg.github.io/file-system-access)
+A Blazor wrapper for the browser API [File System Access](https://wicg.github.io/file-system-access)
 
 The API makes it possible to read and write to your local file system from the browser both files and directories.
 
