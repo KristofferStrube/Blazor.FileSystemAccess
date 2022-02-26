@@ -9,7 +9,9 @@ html, body, #app, .page, main {
 }
 
 .body-article {
-    height: calc(100% - 56px - 1.1rem);
+    height: calc(100% - 56px);
+    padding-bottom:1.1rem;
+    overflow-y:scroll;
 }
 
 h1:focus {

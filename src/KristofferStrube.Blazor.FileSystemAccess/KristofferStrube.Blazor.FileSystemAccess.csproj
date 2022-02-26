@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AnyOf" Version="0.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.1" />
   </ItemGroup>
 

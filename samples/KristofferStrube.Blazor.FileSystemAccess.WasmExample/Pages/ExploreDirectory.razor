@@ -1,0 +1,92 @@
+﻿@page "/ExploreDirectory"
+@inject FileSystemAccessService FileSystemAccessService
+
+<PageTitle>Explore Directory</PageTitle>
+
+@if (DirectoryHandle is null)
+{
+    <button @onclick="OpenDictoryPicker" class="btn btn-primary">Open Directory</button>
+}
+else
+{
+    <table style="border:solid 1px; width:100%; border-collapse: collapse;">
+        @foreach (Entry entry in Entries)
+        {
+            <tr style="border:solid 1px;">
+                <td style="border:solid 1px;">
+                    @if (entry.Kind is FileSystemHandleKind.Directory)
+                    {
+                        <span class="oi oi-folder" aria-hidden="true"></span>
+                    }
+                    else
+                    {
+                        <span class="oi oi-file" aria-hidden="true"></span>
+                    }
+                </td>
+                <td style="border:solid 1px;">
+                    @entry.Name
+                </td>
+                <td style="border:solid 1px;">
+                    @entry.Size
+                </td>
+            </tr>
+        }
+    </table>
+}
+
+
+@code {
+    protected List<Entry> Entries;
+
+    protected FileSystemDirectoryHandle DirectoryHandle;
+
+    protected async Task OpenDictoryPicker()
+    {
+        try
+        {
+            var options = new DirectoryPickerOptions() { StartIn = WellKnownDirectory.Pictures };
+            DirectoryHandle = await FileSystemAccessService.ShowDirectoryPickerAsync(options);
+        }
+        catch (JSException ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            if (DirectoryHandle != null)
+            {
+                var values = await DirectoryHandle.ValuesAsync();
+                Entries = new List<Entry>();
+                foreach (var value in values)
+                {
+                    string size = "";
+                    if (value.Kind is FileSystemHandleKind.File)
+                    {
+                        var fileSystemHandle = await DirectoryHandle.GetFileHandleAsync(value.Name);
+                        var file = await fileSystemHandle.GetFileAsync();
+                        size = ReadableByteSize(file.Size);
+                    }
+                    Entries.Add(new(value.Kind, value.Name, size));
+                }
+            }
+        }
+    }
+
+    protected record Entry(FileSystemHandleKind Kind, string Name, string Size);
+
+    // From https://stackoverflow.com/questions/281640/how-do-i-get-a-human-readable-file-size-in-bytes-abbreviation-using-net
+    private string ReadableByteSize(ulong size)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        int order = 0;
+        while (size >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            size = size / 1024;
+        }
+
+        // Adjust the format string to your preferences. For example "{0:0.#}{1}" would
+        // show a single decimal place, and no space.
+        return String.Format("{0:0.##} {1}", size, sizes[order]);
+    }
+}

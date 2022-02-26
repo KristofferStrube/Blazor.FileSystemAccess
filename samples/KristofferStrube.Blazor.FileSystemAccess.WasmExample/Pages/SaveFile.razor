@@ -3,13 +3,13 @@
 
 <PageTitle>Index</PageTitle>
 
-@if(FileHandle is null)
+@if (FileHandle is null)
 {
     <button @onclick="OpenFilePicker" class="btn btn-primary">Open Save File (override)</button>
 }
 else
 {
-<textarea style="width:100%;height:100%;" value=@FileText @oninput=TextAreaChanged></textarea>
+    <textarea style="width:100%;height:calc(100% - 6px);" value=@FileText @oninput=TextAreaChanged></textarea>
 }
 
 
@@ -22,9 +22,9 @@ else
     {
         try
         {
-            FileHandle = await FileSystemAccessService.ShowSaveFilePickerAsync(new (suggestedName: "newFile.txt"));
+            FileHandle = await FileSystemAccessService.ShowSaveFilePickerAsync();
         }
-        catch(JSException ex)
+        catch (JSException ex)
         {
             Console.WriteLine(ex);
         }

@@ -9,7 +9,7 @@ public class FileSystemFileHandle : FileSystemHandle
     public async Task<File> GetFileAsync()
     {
         var jSFile = await jSReference.InvokeAsync<IJSObjectReference>("getFile");
-        return new File(jSFile);
+        return new File(jSFile, helper);
     }
 
     public async Task<FileSystemWritableFileStream> CreateWritableAsync(FileSystemCreateWritableOptions fileSystemCreateWritableOptions = default)

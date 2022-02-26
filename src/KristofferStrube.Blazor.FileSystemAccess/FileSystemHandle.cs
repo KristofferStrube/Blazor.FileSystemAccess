@@ -4,8 +4,8 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 
 public class FileSystemHandle
 {
-    internal readonly IJSObjectReference jSReference;
-    private readonly IJSInProcessObjectReference helper;
+    protected readonly IJSObjectReference jSReference;
+    protected readonly IJSInProcessObjectReference helper;
 
     internal FileSystemHandle(IJSObjectReference jSReference, IJSInProcessObjectReference helper)
     {
