@@ -3,14 +3,15 @@
 
 <PageTitle>Explore Directory</PageTitle>
 
-@if (DirectoryHandle is null)
+@if (Entities.Count == 0)
 {
     <button @onclick="OpenDictoryPicker" class="btn btn-primary">Open Directory</button>
 }
 else
 {
+    @($"{EntitiesChecked} / {TotalEntities} entites checked for size")
     <table style="border:solid 1px; width:100%; border-collapse: collapse;">
-        @foreach (Entry entry in Entries)
+        @foreach (Entity entry in Entities)
         {
             <tr style="border:solid 1px;">
                 <td style="border:solid 1px;">
@@ -27,7 +28,7 @@ else
                     @entry.Name
                 </td>
                 <td style="border:solid 1px;">
-                    @entry.Size
+                    @ReadableByteSize(entry.Size)
                 </td>
             </tr>
         }
@@ -36,16 +37,19 @@ else
 
 
 @code {
-    protected List<Entry> Entries;
+    protected List<Entity> Entities = new();
 
-    protected FileSystemDirectoryHandle DirectoryHandle;
+    protected int TotalEntities;
+
+    protected int EntitiesChecked;
 
     protected async Task OpenDictoryPicker()
     {
+        FileSystemDirectoryHandle directoryHandle = null;
         try
         {
             var options = new DirectoryPickerOptions() { StartIn = WellKnownDirectory.Pictures };
-            DirectoryHandle = await FileSystemAccessService.ShowDirectoryPickerAsync(options);
+            directoryHandle = await FileSystemAccessService.ShowDirectoryPickerAsync(options);
         }
         catch (JSException ex)
         {
@@ -53,26 +57,59 @@ else
         }
         finally
         {
-            if (DirectoryHandle != null)
+            if (directoryHandle != null)
             {
-                var values = await DirectoryHandle.ValuesAsync();
-                Entries = new List<Entry>();
+                var values = await directoryHandle.ValuesAsync();
+                TotalEntities = values.Length;
+                EntitiesChecked = 0;
+                StateHasChanged();
+                var queue = new Queue<(Entity entity, FileSystemDirectoryHandle dir, FileSystemHandle value)>();
                 foreach (var value in values)
                 {
-                    string size = "";
+                    var entity = new Entity(value.Kind, value.Name);
+                    queue.Enqueue((entity, directoryHandle, value));
+                    Entities.Add(entity);
+                    EntitiesChecked++;
+                    StateHasChanged();
+                }
+                while (queue.Count > 0)
+                {
+                    var (entity, dir, value) = queue.Dequeue();
                     if (value.Kind is FileSystemHandleKind.File)
                     {
-                        var fileSystemHandle = await DirectoryHandle.GetFileHandleAsync(value.Name);
+                        var fileSystemHandle = await dir.GetFileHandleAsync(value.Name);
                         var file = await fileSystemHandle.GetFileAsync();
-                        size = ReadableByteSize(file.Size);
+                        entity.Size += file.Size;
                     }
-                    Entries.Add(new(value.Kind, value.Name, size));
+                    else
+                    {
+                        var fileSystemDirectoryHandle = await dir.GetDirectoryHandleAsync(value.Name);
+                        var innerValues = await fileSystemDirectoryHandle.ValuesAsync();
+                        TotalEntities += innerValues.Length;
+                        StateHasChanged();
+                        foreach (var innerValue in innerValues)
+                        {
+                            queue.Enqueue((entity, fileSystemDirectoryHandle, innerValue));
+                            EntitiesChecked++;
+                            StateHasChanged();
+                        }
+                    }
                 }
             }
         }
     }
 
-    protected record Entry(FileSystemHandleKind Kind, string Name, string Size);
+    protected class Entity
+    {
+        public Entity(FileSystemHandleKind Kind, string Name)
+        {
+            this.Kind = Kind;
+            this.Name = Name;
+        }
+        public FileSystemHandleKind Kind { get; set; }
+        public string Name { get; set; }
+        public ulong Size { get; set; }
+    }
 
     // From https://stackoverflow.com/questions/281640/how-do-i-get-a-human-readable-file-size-in-bytes-abbreviation-using-net
     private string ReadableByteSize(ulong size)
