@@ -17,6 +17,8 @@ public class FileSystemHandle
 
     public FileSystemHandleKind Kind => helper.Invoke<FileSystemHandleKind>("getAttribute", jSReference, "kind");
 
-    public async Task<bool> IsSameEntryAsync(FileSystemHandle other) =>
-        await jSReference.InvokeAsync<bool>("isSameEntry", other.jSReference);
+    public async Task<bool> IsSameEntryAsync(FileSystemHandle other)
+    {
+        return await jSReference.InvokeAsync<bool>("isSameEntry", other.jSReference);
+    }
 }

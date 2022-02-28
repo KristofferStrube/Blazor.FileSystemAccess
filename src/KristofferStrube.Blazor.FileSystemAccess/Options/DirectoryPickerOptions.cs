@@ -5,12 +5,12 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 public class DirectoryPickerOptions
 {
     public AnyOf<WellKnownDirectory, FileSystemHandle> StartIn { get; set; }
-    public string Id { get; set; }
+    public string? Id { get; set; }
 
     internal object Serializable()
     {
-        var startIn = StartIn.CurrentValue;
-        var id = Id;
+        object? startIn = StartIn.CurrentValue;
+        string? id = Id;
         return (StartIn.IsUndefined, Id is null) switch
         {
             (true, true) => new { },

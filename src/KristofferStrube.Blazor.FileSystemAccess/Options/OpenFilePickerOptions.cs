@@ -6,12 +6,12 @@ public class OpenFilePickerOptions : FilePickerOptions
 
     internal object Serializable()
     {
-        var startIn = StartIn.CurrentValue;
-        var multiple = Multiple;
+        object? startIn = StartIn.CurrentValue;
+        bool multiple = Multiple;
         return (StartIn.IsUndefined, Multiple is false) switch
         {
             (true, true) => new { },
-            (true, false) => new { multiple},
+            (true, false) => new { multiple },
             (false, true) => new { startIn },
             (false, false) => new { startIn, multiple },
         };

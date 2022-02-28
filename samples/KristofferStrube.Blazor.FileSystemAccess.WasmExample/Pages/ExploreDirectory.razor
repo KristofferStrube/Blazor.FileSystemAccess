@@ -45,7 +45,7 @@ else
 
     protected async Task OpenDictoryPicker()
     {
-        FileSystemDirectoryHandle directoryHandle = null;
+        FileSystemDirectoryHandle? directoryHandle = null;
         try
         {
             var options = new DirectoryPickerOptions() { StartIn = WellKnownDirectory.Pictures };

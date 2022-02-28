@@ -5,13 +5,17 @@ using System.Text.Json.Serialization;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8603 // Possible null reference return.
+#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
 internal class EnumDescriptionConverter<T> : JsonConverter<T> where T : IComparable, IFormattable, IConvertible
 {
     public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         string jsonValue = reader.GetString();
 
-        foreach (var fi in typeToConvert.GetFields())
+        foreach (FieldInfo? fi in typeToConvert.GetFields())
         {
             DescriptionAttribute description = (DescriptionAttribute)fi.GetCustomAttribute(typeof(DescriptionAttribute), false);
 
@@ -35,3 +39,7 @@ internal class EnumDescriptionConverter<T> : JsonConverter<T> where T : ICompara
         writer.WriteStringValue(description.Description);
     }
 }
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8604 // Possible null reference argument.
+#pragma warning restore CS8603 // Possible null reference return.
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.

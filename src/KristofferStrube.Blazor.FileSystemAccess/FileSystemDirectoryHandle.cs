@@ -8,9 +8,9 @@ public class FileSystemDirectoryHandle : FileSystemHandle
 
     public async Task<FileSystemHandle[]> ValuesAsync()
     {
-        var jSValues = await jSReference.InvokeAsync<IJSObjectReference>("values");
-        var jSEntries = await helper.InvokeAsync<IJSObjectReference>("arrayFrom", jSValues);
-        var length = await helper.InvokeAsync<int>("size", jSEntries);
+        IJSObjectReference? jSValues = await jSReference.InvokeAsync<IJSObjectReference>("values");
+        IJSObjectReference? jSEntries = await helper.InvokeAsync<IJSObjectReference>("arrayFrom", jSValues);
+        int length = await helper.InvokeAsync<int>("size", jSEntries);
         return await Task.WhenAll(
             Enumerable
                 .Range(0, length)
@@ -21,15 +21,15 @@ public class FileSystemDirectoryHandle : FileSystemHandle
         );
     }
 
-    public async Task<FileSystemFileHandle> GetFileHandleAsync(string name, FileSystemGetFileOptions options = default)
+    public async Task<FileSystemFileHandle> GetFileHandleAsync(string name, FileSystemGetFileOptions? options = null)
     {
-        var jSFileSystemFileHandle = await jSReference.InvokeAsync<IJSObjectReference>("getFileHandle", name, options);
+        IJSObjectReference? jSFileSystemFileHandle = await jSReference.InvokeAsync<IJSObjectReference>("getFileHandle", name, options);
         return new FileSystemFileHandle(jSFileSystemFileHandle, helper);
     }
 
-    public async Task<FileSystemDirectoryHandle> GetDirectoryHandleAsync(string name, FileSystemGetDirectoryOptions options = default)
+    public async Task<FileSystemDirectoryHandle> GetDirectoryHandleAsync(string name, FileSystemGetDirectoryOptions? options = null)
     {
-        var jSFileSystemDirectoryHandle = await jSReference.InvokeAsync<IJSObjectReference>("getDirectoryHandle", name, options);
+        IJSObjectReference? jSFileSystemDirectoryHandle = await jSReference.InvokeAsync<IJSObjectReference>("getDirectoryHandle", name, options);
         return new FileSystemDirectoryHandle(jSFileSystemDirectoryHandle, helper);
     }
 }

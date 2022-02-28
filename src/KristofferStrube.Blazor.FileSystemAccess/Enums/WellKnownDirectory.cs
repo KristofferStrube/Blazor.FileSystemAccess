@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace KristofferStrube.Blazor.FileSystemAccess
 {
