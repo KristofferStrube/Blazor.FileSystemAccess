@@ -16,7 +16,7 @@ else
 @code {
     protected string FileText = "";
 
-    protected FileSystemFileHandle FileHandle;
+    protected FileSystemFileHandle? FileHandle;
 
     protected async Task OpenFilePicker()
     {
@@ -40,10 +40,10 @@ else
 
     protected async Task TextAreaChanged(ChangeEventArgs eventArgs)
     {
-        if (FileHandle is not null)
+        if (FileHandle is not null && eventArgs.Value is string value)
         {
             var writable = await FileHandle.CreateWritableAsync();
-            await writable.WriteAsync((string)eventArgs.Value);
+            await writable.WriteAsync(value);
             await writable.CloseAsync();
         }
     }
