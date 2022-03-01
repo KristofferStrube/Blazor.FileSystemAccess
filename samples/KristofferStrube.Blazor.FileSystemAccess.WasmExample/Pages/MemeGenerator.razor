@@ -3,18 +3,24 @@
 @inject IJSRuntime jSRuntime
 @using System.Text.Json.Serialization
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Meme Generator</PageTitle>
 
 <button @onclick="OpenFilePicker" class="btn btn-primary">Open Image</button>
 @if (FileHandle != null)
 {
-    <div class="form-group">
-        <label for="topText">Top Text:</label>
-        <input id="topText" @oninput="WriteTopText" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label for="bottomText">Bottom Text:</label>
-        <input id="bottomText" @oninput="WriteBottomText" class="form-control" />
+    <div class="row">
+        <div class="form-group col">
+            <label for="canvasSize">Canvas Size:</label>
+            <input id="canvasSize" type="number" @oninput="WriteCanvasSize" class="form-control" value=@CanvasSize />
+        </div>
+        <div class="form-group col">
+            <label for="topText">Top Text:</label>
+            <input id="topText" @oninput="WriteTopText" class="form-control" />
+        </div>
+        <div class="form-group col">
+            <label for="bottomText">Bottom Text:</label>
+            <input id="bottomText" @oninput="WriteBottomText" class="form-control" />
+        </div>
     </div>
     <br />
     <button class="btn btn-primary" @onclick=Save>Save</button>
@@ -36,7 +42,7 @@
     private IJSObjectReference JS2dContext;
     private IJSObjectReference JSImageBitmap;
 
-    private double CanvasSize = 700;
+    private double CanvasSize = 600;
 
     private double ImageDrawHeight;
 
@@ -96,18 +102,6 @@
         await JS2dContext.InvokeVoidAsync("drawImage", JSImageBitmap, 0, 0, ImageDrawWidth, ImageDrawHeight);
     }
 
-    protected async Task WriteTopText(ChangeEventArgs eventArgs)
-    {
-        TopText = (string)eventArgs.Value;
-        await WriteText();
-    }
-
-    protected async Task WriteBottomText(ChangeEventArgs eventArgs)
-    {
-        BottomText = (string)eventArgs.Value;
-        await WriteText();
-    }
-
     public async Task WriteText()
     {
         await DrawImage();
@@ -124,6 +118,24 @@
         // Bottom Text
         await JS2dContext.InvokeVoidAsync("fillText", BottomText, ImageDrawWidth / 2, ImageDrawHeight - 12, ImageDrawWidth - 24);
         await JS2dContext.InvokeVoidAsync("strokeText", BottomText, ImageDrawWidth / 2, ImageDrawHeight - 12, ImageDrawWidth - 24);
+    }
+
+    protected async Task WriteCanvasSize(ChangeEventArgs eventArgs)
+    {
+        CanvasSize = double.Parse((string)eventArgs.Value);
+        await WriteText();
+    }
+
+    protected async Task WriteTopText(ChangeEventArgs eventArgs)
+    {
+        TopText = (string)eventArgs.Value;
+        await WriteText();
+    }
+
+    protected async Task WriteBottomText(ChangeEventArgs eventArgs)
+    {
+        BottomText = (string)eventArgs.Value;
+        await WriteText();
     }
 
     public async Task Save()
