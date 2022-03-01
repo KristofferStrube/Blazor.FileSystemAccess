@@ -4,19 +4,23 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 
 public class FileSystemWritableFileStream
 {
-    private readonly IJSObjectReference jSReference;
+    public readonly IJSObjectReference JSReference;
 
     internal FileSystemWritableFileStream(IJSObjectReference jSReference)
     {
-        this.jSReference = jSReference;
+        this.JSReference = jSReference;
     }
 
     public async Task WriteAsync(string data)
     {
-        await jSReference.InvokeVoidAsync("write", data);
+        await JSReference.InvokeVoidAsync("write", data);
+    }
+    public async Task WriteAsync(Blob data)
+    {
+        await JSReference.InvokeVoidAsync("write", data.JSReference);
     }
     public async Task CloseAsync()
     {
-        await jSReference.InvokeVoidAsync("close");
+        await JSReference.InvokeVoidAsync("close");
     }
 }

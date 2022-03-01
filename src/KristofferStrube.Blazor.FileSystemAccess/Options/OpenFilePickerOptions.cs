@@ -1,19 +1,18 @@
-﻿namespace KristofferStrube.Blazor.FileSystemAccess;
+﻿using System.Text.Json.Serialization;
+using System.Dynamic;
+
+namespace KristofferStrube.Blazor.FileSystemAccess;
 
 public class OpenFilePickerOptions : FilePickerOptions
 {
     public bool Multiple { get; set; }
 
-    internal object Serializable()
+    internal new ExpandoObject Serializable()
     {
-        object? startIn = StartIn.CurrentValue;
-        bool multiple = Multiple;
-        return (StartIn.IsUndefined, Multiple is false) switch
-        {
-            (true, true) => new { },
-            (true, false) => new { multiple },
-            (false, true) => new { startIn },
-            (false, false) => new { startIn, multiple },
-        };
+        dynamic res = base.Serializable();
+        if (!Multiple)
+            res.multiple = Multiple;
+        return res;
     }
+
 }

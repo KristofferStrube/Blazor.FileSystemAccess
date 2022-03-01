@@ -1,19 +1,16 @@
-﻿namespace KristofferStrube.Blazor.FileSystemAccess;
+﻿using System.Dynamic;
+
+namespace KristofferStrube.Blazor.FileSystemAccess;
 
 public class SaveFilePickerOptions : FilePickerOptions
 {
     public string? SuggestedName { get; set; }
 
-    internal object Serializable()
+    internal new ExpandoObject Serializable()
     {
-        object? startIn = StartIn.CurrentValue;
-        string? suggestedName = SuggestedName;
-        return (StartIn.IsUndefined, SuggestedName is null) switch
-        {
-            (true, true) => new { },
-            (true, false) => new { suggestedName },
-            (false, true) => new { startIn },
-            (false, false) => new { startIn, suggestedName },
-        };
+        dynamic res = base.Serializable();
+        if (SuggestedName != null)
+            res.suggestedName = SuggestedName;
+        return res;
     }
 }

@@ -4,22 +4,22 @@ namespace KristofferStrube.Blazor.FileSystemAccess
 {
     public class Blob
     {
-        protected readonly IJSObjectReference jSReference;
+        public readonly IJSObjectReference JSReference;
         protected readonly IJSInProcessObjectReference helper;
 
-        internal Blob(IJSObjectReference jSReference, IJSInProcessObjectReference helper)
+        public Blob(IJSObjectReference jSReference, IJSInProcessObjectReference helper)
         {
-            this.jSReference = jSReference;
+            this.JSReference = jSReference;
             this.helper = helper;
         }
 
-        public ulong Size => helper.Invoke<ulong>("getAttribute", jSReference, "size");
+        public ulong Size => helper.Invoke<ulong>("getAttribute", JSReference, "size");
 
-        public string Type => helper.Invoke<string>("getAttribute", jSReference, "type");
+        public string Type => helper.Invoke<string>("getAttribute", JSReference, "type");
 
         public async Task<string> TextAsync()
         {
-            return await jSReference.InvokeAsync<string>("text");
+            return await JSReference.InvokeAsync<string>("text");
         }
     }
 }

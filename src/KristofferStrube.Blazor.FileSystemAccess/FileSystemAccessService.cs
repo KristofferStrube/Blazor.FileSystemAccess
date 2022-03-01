@@ -7,6 +7,8 @@ public class FileSystemAccessService : IAsyncDisposable
     private readonly Lazy<Task<IJSInProcessObjectReference>> moduleTask;
     private readonly IJSRuntime jsRuntime;
 
+    public async Task<IJSInProcessObjectReference> HelperAsync() => await moduleTask.Value;
+
     public FileSystemAccessService(IJSRuntime jsRuntime)
     {
         moduleTask = new(() => jsRuntime.InvokeAsync<IJSInProcessObjectReference>(

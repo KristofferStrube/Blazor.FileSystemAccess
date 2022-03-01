@@ -1,22 +1,20 @@
 ﻿using AnyOfTypes;
+using System.Dynamic;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
 public class DirectoryPickerOptions
 {
-    public AnyOf<WellKnownDirectory, FileSystemHandle> StartIn { get; set; }
     public string? Id { get; set; }
+    public AnyOf<WellKnownDirectory, FileSystemHandle> StartIn { get; set; }
 
-    internal object Serializable()
+    internal ExpandoObject Serializable()
     {
-        object? startIn = StartIn.CurrentValue;
-        string? id = Id;
-        return (StartIn.IsUndefined, Id is null) switch
-        {
-            (true, true) => new { },
-            (true, false) => new { id },
-            (false, true) => new { startIn },
-            (false, false) => new { startIn, id },
-        };
+        dynamic res = new ExpandoObject();
+        if (Id != null)
+            res.id = Id;
+        if (!StartIn.IsUndefined)
+            res.startIn = StartIn.CurrentValue;
+        return res;
     }
 }
