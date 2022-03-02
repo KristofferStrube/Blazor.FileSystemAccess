@@ -10,7 +10,10 @@ public class SaveFilePickerOptions : FilePickerOptions
     {
         dynamic res = base.Serializable();
         if (SuggestedName != null)
+        {
             res.suggestedName = SuggestedName;
+        }
+
         return res;
     }
 }

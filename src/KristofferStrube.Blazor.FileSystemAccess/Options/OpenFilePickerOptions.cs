@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using System.Dynamic;
+﻿using System.Dynamic;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
@@ -11,7 +10,10 @@ public class OpenFilePickerOptions : FilePickerOptions
     {
         dynamic res = base.Serializable();
         if (!Multiple)
+        {
             res.multiple = Multiple;
+        }
+
         return res;
     }
 

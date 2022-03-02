@@ -12,9 +12,15 @@ public class DirectoryPickerOptions
     {
         dynamic res = new ExpandoObject();
         if (Id != null)
+        {
             res.id = Id;
+        }
+
         if (!StartIn.IsUndefined)
+        {
             res.startIn = StartIn.CurrentValue;
+        }
+
         return res;
     }
 }

@@ -38,9 +38,9 @@
     private string TopText = "";
     private string BottomText = "";
 
-    private IJSObjectReference JSCanvas;
-    private IJSObjectReference JS2dContext;
-    private IJSObjectReference JSImageBitmap;
+    private IJSObjectReference? JSCanvas;
+    private IJSObjectReference? JS2dContext;
+    private IJSObjectReference? JSImageBitmap;
 
     private double CanvasSize = 600;
 
@@ -93,6 +93,7 @@
 
     public async Task DrawImage()
     {
+        if (JS2dContext == null) return;
         double imageWidth = await jSRuntime.InvokeAsync<double>("getAttribute", JSImageBitmap, "width");
         double imageHeight = await jSRuntime.InvokeAsync<double>("getAttribute", JSImageBitmap, "height");
         ImageDrawWidth = (imageWidth > imageHeight ? 1 : imageWidth / imageHeight) * CanvasSize;
@@ -104,6 +105,7 @@
 
     public async Task WriteText()
     {
+        if (JS2dContext == null) return;
         await DrawImage();
         // Set Draw style
         await jSRuntime.InvokeVoidAsync("setAttribute", JS2dContext, "font", "bold 48px impact");
@@ -114,7 +116,6 @@
         // Top Text
         await JS2dContext.InvokeVoidAsync("fillText", TopText, ImageDrawWidth / 2, 60, ImageDrawWidth - 24);
         await JS2dContext.InvokeVoidAsync("strokeText", TopText, ImageDrawWidth / 2, 60, ImageDrawWidth - 24);
-
         // Bottom Text
         await JS2dContext.InvokeVoidAsync("fillText", BottomText, ImageDrawWidth / 2, ImageDrawHeight - 12, ImageDrawWidth - 24);
         await JS2dContext.InvokeVoidAsync("strokeText", BottomText, ImageDrawWidth / 2, ImageDrawHeight - 12, ImageDrawWidth - 24);
