@@ -44,21 +44,15 @@
         function jSReference(element) { return element.valueOf(); }
         function getAttribute(object, attribute) { return object[attribute]; }
         function setAttribute(object, attribute, value) { object[attribute] = value; }
-        async function canvasToBlob(canvas) {
-            var responseBlob = null;
+        function toBlob(canvas, blobCallback) {
+            var blobWrapper = {};
             canvas.toBlob(
                 (blob) => {
-                    responseBlob = blob;
-                    //blobCallback.objRef.invokeMethod('Callback');
+                    blobWrapper.blob = blob;
+                    blobCallback.objRef.invokeMethodAsync('Callback');
                 },
                 quality = 1);
-            while (responseBlob == null) {
-                await sleep(10);
-            }
-            return responseBlob;
-        }
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
+            return blobWrapper;
         }
     </script>
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />

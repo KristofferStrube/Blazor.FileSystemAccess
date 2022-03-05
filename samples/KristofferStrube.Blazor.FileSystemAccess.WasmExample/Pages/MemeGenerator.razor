@@ -157,14 +157,49 @@
         }
         finally
         {
-            if (saveFileHandle != null)
+            if (saveFileHandle != null && JSCanvas != null)
             {
-                var jsBlob = await jSRuntime.InvokeAsync<IJSObjectReference>("canvasToBlob", JSCanvas);
-                var blob = new Blob(jsBlob, await FileSystemAccessService.HelperAsync());
-                var writable = await saveFileHandle.CreateWritableAsync();
-                await writable.WriteAsync(blob);
-                await writable.CloseAsync();
+                var blobCallback = new BlobCallback(jSRuntime, await FileSystemAccessService.HelperAsync());
+                blobCallback.Callback = async (Blob blob) =>
+                {
+                    var writable = await saveFileHandle.CreateWritableAsync();
+                    await writable.WriteAsync(blob);
+                    await writable.CloseAsync();
+                };
+                await blobCallback.toBlob(JSCanvas);
             }
+        }
+    }
+
+    public class BlobCallback
+    {
+        private IJSObjectReference blobWrapper;
+        private IJSRuntime jSRuntime;
+        private IJSInProcessObjectReference helper;
+
+        public BlobCallback(IJSRuntime jSRuntime, IJSInProcessObjectReference helper)
+        {
+            this.jSRuntime = jSRuntime;
+            this.helper = helper;
+            objRef = DotNetObjectReference.Create(this);
+        }
+
+        public DotNetObjectReference<BlobCallback> objRef { get; init; }
+
+        [JsonIgnore]
+        public Action<Blob> Callback { get; set; }
+
+        [JSInvokable("Callback")]
+        public async Task InvokeCallback()
+        {
+            var jSBlob = await jSRuntime.InvokeAsync<IJSObjectReference>("getAttribute", blobWrapper, "blob");
+            var blob = new Blob(jSBlob, helper);
+            Callback?.Invoke(blob);
+        }
+        
+        public async Task toBlob(IJSObjectReference jSCanvas)
+        {
+            blobWrapper = await jSRuntime.InvokeAsync<IJSObjectReference>("toBlob", jSCanvas, this);
         }
     }
 }
