@@ -166,7 +166,7 @@
                     await writable.WriteAsync(blob);
                     await writable.CloseAsync();
                 };
-                await blobCallback.toBlob(JSCanvas);
+                await blobCallback.ToBlobAsync(JSCanvas);
             }
         }
     }
@@ -197,7 +197,7 @@
             Callback?.Invoke(blob);
         }
         
-        public async Task toBlob(IJSObjectReference jSCanvas)
+        public async Task ToBlobAsync(IJSObjectReference jSCanvas)
         {
             blobWrapper = await jSRuntime.InvokeAsync<IJSObjectReference>("toBlob", jSCanvas, this);
         }
