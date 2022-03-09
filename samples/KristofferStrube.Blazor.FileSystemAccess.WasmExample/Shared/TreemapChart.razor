@@ -1,0 +1,176 @@
+﻿@typeparam TItem
+
+<div @ref="ContainingDivReference" style="height:100%;">
+    @if (Height != 1)
+    {
+        <svg width=@Width height=@Height>
+            @foreach (var rectangle in Rectangles)
+            {
+                <g @onclick="() => OnClick(rectangle.Item)"
+           @onmouseover="() => OnMouseOver(rectangle.Item)"
+           @onmouseout="() => OnMouseOut(rectangle.Item)">
+                    <rect x=@rectangle.X.AsString()
+                  y=@rectangle.Y.AsString()
+                  width=@rectangle.Width.AsString()
+                  height=@rectangle.Height.AsString()
+                  fill=@rectangle.Fill
+                  stroke-width=@StrokeWidth
+                  stroke=@rectangle.Stroke />
+                    <text x=@((rectangle.X+5).AsString())
+                  y=@((rectangle.Y+20).AsString())
+                  fill=@TextColor>
+                        @rectangle.Label
+                    </text>
+                </g>
+            }
+        </svg>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public double Padding { get; set; } = 2;
+
+    [Parameter]
+    public double StrokeWidth { get; set; } = 2;
+
+    [Parameter]
+    public string TextColor { get; set; } = "black";
+
+    [Parameter]
+    [EditorRequired]
+    public IEnumerable<TItem> Items { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public Func<TItem, double> QuantityMapper { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public Func<TItem, string> LabelMapper { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public Func<TItem, string> FillMapper { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public Func<TItem, bool> IsLeaf { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public Func<TItem, IEnumerable<TItem>> Children { get; set; }
+
+    [Parameter]
+    public Func<TItem, string> StrokeMapper { get; set; } = _ => "none";
+
+    [Parameter]
+    public Action<TItem> OnClick { get; set; } = _ => { };
+
+    [Parameter]
+    public Action<TItem> OnMouseOver { get; set; } = _ => { };
+
+    [Parameter]
+    public Action<TItem> OnMouseOut { get; set; } = _ => { };
+
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
+
+    private List<Rectangle> Rectangles = new();
+
+    private ElementReference ContainingDivReference { get; set; }
+
+    private double Width = 1;
+
+    private double Height = 1;
+
+    protected override void OnParametersSet()
+    {
+        CalculateLayout();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var jSContainer = await JSRuntime.InvokeAsync<IJSObjectReference>("jSReference", ContainingDivReference);
+        var boundingRect = await jSContainer.InvokeAsync<IJSObjectReference>("getBoundingClientRect");
+        var width = await JSRuntime.InvokeAsync<double>("getAttribute", boundingRect, "width");
+        var height = await JSRuntime.InvokeAsync<double>("getAttribute", boundingRect, "height");
+        if (width != Width || height != Height)
+        {
+            Width = width;
+            Height = height;
+            CalculateLayout();
+        }
+    }
+
+    private void CalculateLayout()
+    {
+        Rectangles = new();
+        SubLayout(Items, 0, 0, 0, 0, out var x, out var y, Width, Height);
+    }
+
+    private void SubLayout(IEnumerable<TItem> elements, double startX, double startY, double x, double y, out double outX, out double outY, double width, double height)
+    {
+        var sum = elements.Sum(item => QuantityMapper(item));
+        var orderedElements = elements.OrderByDescending(item => QuantityMapper(item));
+        foreach (var item in orderedElements)
+        {
+            if (IsLeaf(item))
+            {
+                var quantity = QuantityMapper(item);
+                var area = width * height * (quantity / sum);
+                if (height - y > width - x)
+                {
+                    // We fill on horizontal
+                    var rectangle = new Rectangle(
+                        Item: item,
+                        X: startX + x + Padding,
+                        Y: startY + y + Padding,
+                        Width: width - x - Padding * 2,
+                        Height: area / (width - x) - Padding * 2,
+                        Label: LabelMapper(item),
+                        Fill: FillMapper(item),
+                        Stroke: StrokeMapper(item)
+                    );
+                    y += area / (width - x);
+                    Rectangles.Add(rectangle);
+                }
+                else
+                {
+                    // We fill on vertical
+                    var rectangle = new Rectangle(
+                        Item: item,
+                        X: startX + x + Padding,
+                        Y: startY + y + Padding,
+                        Width: area / (height - y) - Padding * 2,
+                        Height: height - y - Padding * 2,
+                        Label: LabelMapper(item),
+                        Fill: FillMapper(item),
+                        Stroke: StrokeMapper(item)
+                    );
+                    x += area / (height - y);
+                    Rectangles.Add(rectangle);
+                }
+            }
+            else
+            {
+                var quantity = QuantityMapper(item);
+                var area = width * height * (quantity / sum);
+                if (height - y > width - x)
+                {
+                    SubLayout(Children(item), x, y, 0, 0, out var moveX, out var moveY, width - x, area / (width - x) - Padding * 2);
+                    y += area / (width - x);
+                }
+                else
+                {
+                    SubLayout(Children(item), x, y, 0, 0, out var moveX, out var moveY, area / (height - y) - Padding * 2, height - y);
+                    x += area / (height - y);
+                }
+            }
+        }
+        outX = x;
+        outY = y;
+    }
+
+    private record Rectangle(TItem Item, double X, double Y, double Width, double Height, string Label, string Fill, string Stroke);
+}
