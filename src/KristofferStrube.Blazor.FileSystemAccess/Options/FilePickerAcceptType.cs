@@ -10,5 +10,5 @@ public class FilePickerAcceptType
 
     [JsonPropertyName("accept")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public Dictionary<string, string[]> Accept { get; set; }
+    public Dictionary<string, string[]>? Accept { get; set; }
 }

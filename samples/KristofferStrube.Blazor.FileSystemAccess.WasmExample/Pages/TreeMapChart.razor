@@ -9,7 +9,7 @@
 }
 else
 {
-    @($"{TotalEntities} entites checked for size")
+    @($"{EntitiesChecked} entities checked for size")
     <br />
     @if (HoverItem != null)
     {
@@ -33,8 +33,6 @@ else
     protected Entity? HoverItem;
 
     protected Entity RootEntity = new(FileSystemHandleKind.Directory, "Root", 0);
-
-    protected int TotalEntities;
 
     protected int EntitiesChecked;
 
@@ -63,7 +61,7 @@ else
     private async Task BreadthFirstTraversal(FileSystemDirectoryHandle directoryHandle)
     {
         var values = await directoryHandle.ValuesAsync();
-        TotalEntities = 0;
+        EntitiesChecked = 0;
         StateHasChanged();
         var queue = new Queue<(Entity entity, FileSystemDirectoryHandle dir, FileSystemHandle value)>();
         for (int i = 0; i < values.Count(); i++)
@@ -77,7 +75,7 @@ else
         while (queue.Count > 0)
         {
             var (entity, dir, value) = queue.Dequeue();
-            TotalEntities += 1;
+            EntitiesChecked += 1;
             if (value.Kind is FileSystemHandleKind.File)
             {
                 var fileSystemHandle = await dir.GetFileHandleAsync(value.Name);

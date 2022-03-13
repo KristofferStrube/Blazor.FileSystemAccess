@@ -28,6 +28,7 @@
 </div>
 
 @code {
+#pragma warning disable CS8618 // Paramereters are non-null as they are EditorRequired or Injected.
     [Parameter]
     public double Padding { get; set; } = 2;
 
@@ -111,7 +112,7 @@
 
     private void SubLayout(IEnumerable<TItem> elements, double startX, double startY, double x, double y, out double outX, out double outY, double width, double height)
     {
-        var sum = elements.Sum(item => QuantityMapper(item));
+        var sum = elements.Sum(item => QuantityMapper.Invoke(item));
         var orderedElements = elements.OrderByDescending(item => QuantityMapper(item));
         foreach (var item in orderedElements)
         {

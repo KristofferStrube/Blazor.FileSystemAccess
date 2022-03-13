@@ -123,20 +123,29 @@
 
     protected async Task WriteCanvasSize(ChangeEventArgs eventArgs)
     {
-        CanvasSize = double.Parse((string)eventArgs.Value);
-        await WriteText();
+        if (eventArgs.Value is string size)
+        {
+            CanvasSize = double.Parse(size);
+            await WriteText();
+        }
     }
 
     protected async Task WriteTopText(ChangeEventArgs eventArgs)
     {
-        TopText = (string)eventArgs.Value;
-        await WriteText();
+        if (eventArgs.Value is string topText)
+        {
+            TopText = topText;
+            await WriteText();
+        }
     }
 
     protected async Task WriteBottomText(ChangeEventArgs eventArgs)
     {
-        BottomText = (string)eventArgs.Value;
-        await WriteText();
+        if (eventArgs.Value is string bottomText)
+        {
+            BottomText = bottomText;
+            await WriteText();
+        }
     }
 
     public async Task Save()
@@ -144,10 +153,11 @@
         FileSystemFileHandle? saveFileHandle = null;
         try
         {
+            var suggestedName = FileHandle is null ? "meme" : "meme_" + FileHandle.Name;
             var options = new SaveFilePickerOptions()
                 {
                     StartIn = WellKnownDirectory.Pictures,
-                    SuggestedName = "meme_" + FileHandle.Name
+                    SuggestedName = suggestedName
                 };
             saveFileHandle = await FileSystemAccessService.ShowSaveFilePickerAsync(options);
         }
@@ -173,7 +183,7 @@
 
     public class BlobCallback
     {
-        private IJSObjectReference blobWrapper;
+        private IJSObjectReference? blobWrapper;
         private IJSRuntime jSRuntime;
         private IJSInProcessObjectReference helper;
 
@@ -187,7 +197,7 @@
         public DotNetObjectReference<BlobCallback> objRef { get; init; }
 
         [JsonIgnore]
-        public Action<Blob> Callback { get; set; }
+        public Action<Blob>? Callback { get; set; }
 
         [JSInvokable("Callback")]
         public async Task InvokeCallback()
@@ -196,7 +206,7 @@
             var blob = new Blob(jSBlob, helper);
             Callback?.Invoke(blob);
         }
-        
+
         public async Task ToBlobAsync(IJSObjectReference jSCanvas)
         {
             blobWrapper = await jSRuntime.InvokeAsync<IJSObjectReference>("toBlob", jSCanvas, this);
