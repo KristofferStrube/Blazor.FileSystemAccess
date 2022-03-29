@@ -3,6 +3,9 @@ using System.Dynamic;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
+/// <summary>
+/// <see href="https://wicg.github.io/file-system-access/#dictdef-filepickeroptions">FilePickerOptions browser specs</see>
+/// </summary>
 public class FilePickerOptions
 {
     public FilePickerAcceptType[]? Types { get; set; }

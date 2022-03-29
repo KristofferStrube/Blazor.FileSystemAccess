@@ -7,6 +7,10 @@ public class FileSystemAccessService : IAsyncDisposable
     private readonly Lazy<Task<IJSInProcessObjectReference>> moduleTask;
     private readonly IJSRuntime jsRuntime;
 
+    /// <summary>
+    /// Helper object that can access helper JS functions needed in the library
+    /// </summary>
+    /// <returns></returns>
     public async Task<IJSInProcessObjectReference> HelperAsync()
     {
         return await moduleTask.Value;
@@ -19,6 +23,11 @@ public class FileSystemAccessService : IAsyncDisposable
         this.jsRuntime = jsRuntime;
     }
 
+    /// <summary>
+    /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
+    /// </summary>
+    /// <param name="openFilePickerOptions"></param>
+    /// <returns></returns>
     public async Task<FileSystemFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptions? openFilePickerOptions = null)
     {
         IJSInProcessObjectReference? helper = await moduleTask.Value;
@@ -34,6 +43,11 @@ public class FileSystemAccessService : IAsyncDisposable
         );
     }
 
+    /// <summary>
+    /// <see href="https://wicg.github.io/file-system-access/#api-showsavefilepicker">showSaveFilePicker() browser specs</see>
+    /// </summary>
+    /// <param name="saveFilePickerOptions"></param>
+    /// <returns></returns>
     public async Task<FileSystemFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptions? saveFilePickerOptions = null)
     {
         IJSInProcessObjectReference? helper = await moduleTask.Value;
@@ -41,6 +55,11 @@ public class FileSystemAccessService : IAsyncDisposable
         return new FileSystemFileHandle(jSFileHandle, helper);
     }
 
+    /// <summary>
+    /// <see href="https://wicg.github.io/file-system-access/#api-showdirectorypicker">showDirectoryPicker() browser specs</see>
+    /// </summary>
+    /// <param name="directoryPickerOptions"></param>
+    /// <returns></returns>
     public async Task<FileSystemDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptions? directoryPickerOptions = null)
     {
         IJSInProcessObjectReference? helper = await moduleTask.Value;

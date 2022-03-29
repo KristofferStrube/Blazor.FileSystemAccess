@@ -2,6 +2,9 @@
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
+/// <summary>
+/// <see href="https://wicg.github.io/file-system-access/#api-filesystemwritablefilestream">FileSystemWritableFileStream browser specs</see>
+/// </summary>
 public class FileSystemWritableFileStream
 {
     public readonly IJSObjectReference JSReference;

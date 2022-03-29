@@ -2,6 +2,9 @@
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
+/// <summary>
+/// <see href="https://w3c.github.io/FileAPI/#dfn-file">File browser specs</see>
+/// </summary>
 public class File : Blob
 {
     internal File(IJSObjectReference jSReference, IJSInProcessObjectReference helper) : base(jSReference, helper) { }

@@ -2,6 +2,9 @@
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
+/// <summary>
+/// <see href="https://wicg.github.io/file-system-access/#api-filesystemhandle">FileSystemHandle browser specs</see>
+/// </summary>
 public class FileSystemHandle
 {
     public readonly IJSObjectReference JSReference;

@@ -3,6 +3,9 @@ using System.Dynamic;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
+/// <summary>
+/// <see href="https://wicg.github.io/file-system-access/#dictdef-directorypickeroptions">DirectoryPickerOptions browser specs</see>
+/// </summary>
 public class DirectoryPickerOptions
 {
     public string? Id { get; set; }
