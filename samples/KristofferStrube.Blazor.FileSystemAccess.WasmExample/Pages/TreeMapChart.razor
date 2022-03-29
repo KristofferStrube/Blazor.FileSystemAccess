@@ -17,12 +17,12 @@ else
     }
     <br />
     <div style="height:calc(100% - 70px);">
-        <TreemapChart Items=RootEntity.Children
+        <TreemapChart Items=rootEntity.Children
                   QuantityMapper="item => Size(item)"
                   LabelMapper=@(item => "")
-                  FillMapper="item => Rainbow(RootEntity.Children.OrderBy(e => e.Size).ToList().IndexOf(RootEntity.Children.First(e => e.ColorIndex == item.ColorIndex)), RootEntity.Children.Count)"
-                  OnMouseOver="item => {HoverItem = item; StateHasChanged();}"
-                  OnMouseOut="item =>  {HoverItem = null; StateHasChanged();}"
+                  FillMapper="item => Rainbow(rootEntity.Children.OrderBy(e => e.Size).ToList().IndexOf(rootEntity.Children.First(e => e.ColorIndex == item.ColorIndex)), rootEntity.Children.Count)"
+                  OnMouseOver="item => {hoverItem = item; StateHasChanged();}"
+                  OnMouseOut="item =>  {hoverItem = null; StateHasChanged();}"
                   Children="item => item.Children"
                   IsLeaf="item => item is { Children: { Count: 0 } }"
                   Padding="1"/>
