@@ -3,17 +3,17 @@
 
 <PageTitle>Tree Map Chart</PageTitle>
 
-@if (RootEntity.Children.Count == 0)
+@if (rootEntity.Children.Count == 0)
 {
     <button @onclick="OpenDictoryPicker" class="btn btn-primary">Open Directory</button>
 }
 else
 {
-    @($"{EntitiesChecked} entities checked for size")
+    @($"{entitiesChecked} entities checked for size")
     <br />
-    @if (HoverItem != null)
+    @if (hoverItem != null)
     {
-        <b>@HoverItem.Name: </b> @ReadableByteSize(Size(HoverItem))
+        <b>@hoverItem.Name: </b> @ReadableByteSize(Size(hoverItem))
     }
     <br />
     <div style="height:calc(100% - 70px);">
@@ -30,11 +30,11 @@ else
 }
 
 @code {
-    protected Entity? HoverItem;
+    private Entity? hoverItem;
 
-    protected Entity RootEntity = new(FileSystemHandleKind.Directory, "Root", 0);
+    private Entity rootEntity = new(FileSystemHandleKind.Directory, "Root", 0);
 
-    protected int EntitiesChecked;
+    private int entitiesChecked;
 
     protected async Task OpenDictoryPicker()
     {
@@ -61,21 +61,21 @@ else
     private async Task BreadthFirstTraversal(FileSystemDirectoryHandle directoryHandle)
     {
         var values = await directoryHandle.ValuesAsync();
-        EntitiesChecked = 0;
+        entitiesChecked = 0;
         StateHasChanged();
         var queue = new Queue<(Entity entity, FileSystemDirectoryHandle dir, FileSystemHandle value)>();
         for (int i = 0; i < values.Count(); i++)
         {
             var value = values[i];
             var entity = new Entity(value.Kind, value.Name, i);
-            RootEntity.Children.Add(entity);
+            rootEntity.Children.Add(entity);
             queue.Enqueue((entity, directoryHandle, value));
             StateHasChanged();
         }
         while (queue.Count > 0)
         {
             var (entity, dir, value) = queue.Dequeue();
-            EntitiesChecked += 1;
+            entitiesChecked += 1;
             if (value.Kind is FileSystemHandleKind.File)
             {
                 var fileSystemHandle = await dir.GetFileHandleAsync(value.Name);

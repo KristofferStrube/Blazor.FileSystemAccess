@@ -24,4 +24,14 @@ public class FileSystemHandle
     {
         return await JSReference.InvokeAsync<bool>("isSameEntry", other.JSReference);
     }
+
+    public async Task<PermissionState> QueryPermission(FileSystemHandlePermissionDescriptor? description = null)
+    {
+        return await JSReference.InvokeAsync<PermissionState>("queryPermission", description);
+    }
+
+    public async Task<PermissionState> RequestPermission(FileSystemHandlePermissionDescriptor? description = null)
+    {
+        return await JSReference.InvokeAsync<PermissionState>("requestPermission", description);
+    }
 }
