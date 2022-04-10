@@ -61,6 +61,7 @@ else
 
     private async Task ReadFile()
     {
+        if (fileHandle is null) return;
         Console.WriteLine($"Name: {fileHandle.Name}");
         Console.WriteLine($"Kind: {fileHandle.Kind}");
         Console.WriteLine($"Is Same as Self: {await fileHandle.IsSameEntryAsync(fileHandle)}");

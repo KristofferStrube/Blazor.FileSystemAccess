@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using KristofferStrube.Blazor.FileSystemAccess.Extensions;
+using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
@@ -10,7 +11,13 @@ public class Blob
     public readonly IJSObjectReference JSReference;
     protected readonly IJSInProcessObjectReference helper;
 
-    public Blob(IJSObjectReference jSReference, IJSInProcessObjectReference helper)
+    public static async Task<Blob> CreateAsync(IJSObjectReference jSReference, IJSRuntime jSRuntime)
+    {
+        IJSInProcessObjectReference helper = await jSRuntime.GetHelperAsync();
+        return new Blob(jSReference, helper);
+    }
+
+    internal Blob(IJSObjectReference jSReference, IJSInProcessObjectReference helper)
     {
         this.JSReference = jSReference;
         this.helper = helper;
