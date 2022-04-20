@@ -13,9 +13,9 @@ else
     <input id="cursorPosition" class="form-control" type="number" @bind-value=cursorPosition />
     <br />
     <label for="keyInput">Key Input: </label>
-    <input id="keyInput" class="form-control" type="number" value=@keyInput @onkeydown=KeyDown />
+    <input id="keyInput" class="form-control" value=@keyInput readonly @onkeydown=KeyDown />
     <br />
-    <textarea style="width:100%;height:calc(100% - 180px);" value=@fileText disabled @oninput=TextAreaChanged></textarea>
+    <textarea style="width:100%;height:calc(100% - 180px);" value=@fileText disabled></textarea>
 }
 
 
@@ -53,31 +53,19 @@ else
         }
     }
 
-    private async Task TextAreaChanged(ChangeEventArgs eventArgs)
-    {
-        if (fileHandle is not null && eventArgs.Value is string value)
-        {
-            var writable = await fileHandle.CreateWritableAsync();
-            await writable.WriteAsync(value);
-            await writable.CloseAsync();
-        }
-    }
-
     private async Task KeyDown(KeyboardEventArgs eventArgs)
     {
-        if (!eventArgs.Repeat &&  fileHandle is not null && eventArgs.Key is { Length: 1 } key && allowedChars.Contains(char.Parse(key)))
+        if (!eventArgs.Repeat && fileHandle is not null && eventArgs.Key is { Length: 1 } key && allowedChars.Contains(char.Parse(key)))
         {
-            keyInput = string.Empty;
             var file = await fileHandle.GetFileAsync();
             var writable = await fileHandle.CreateWritableAsync();
             await writable.WriteAsync(fileText);
             await writable.SeekAsync((ulong)cursorPosition);
-            await writable.WriteAsync(eventArgs.Key);
+            await writable.WriteAsync(key);
             await writable.CloseAsync();
             file = await fileHandle.GetFileAsync();
             fileText = await file.TextAsync();
             StateHasChanged();
         }
-
     }
 }
