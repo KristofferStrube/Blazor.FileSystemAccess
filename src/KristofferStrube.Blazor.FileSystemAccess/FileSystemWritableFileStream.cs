@@ -7,23 +7,41 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 /// </summary>
 public class FileSystemWritableFileStream
 {
-    public readonly IJSObjectReference JSReference;
+    protected readonly IJSObjectReference jSReference;
+    protected readonly IJSInProcessObjectReference helper;
 
-    internal FileSystemWritableFileStream(IJSObjectReference jSReference)
+    internal FileSystemWritableFileStream(IJSObjectReference jSReference, IJSInProcessObjectReference helper)
     {
-        this.JSReference = jSReference;
+        this.jSReference = jSReference;
+        this.helper = helper;
     }
 
     public async Task WriteAsync(string data)
     {
-        await JSReference.InvokeVoidAsync("write", data);
+        await jSReference.InvokeVoidAsync("write", data);
     }
     public async Task WriteAsync(Blob data)
     {
-        await JSReference.InvokeVoidAsync("write", data.JSReference);
+        await jSReference.InvokeVoidAsync("write", data.JSReference);
+    }
+    public async Task WriteAsync(BlobWriteParams data)
+    {
+        await helper.InvokeVoidAsync("WriteBlobWriteParams", jSReference, data, data.Data.JSReference);
+    }
+    public async Task WriteAsync(StringWriteParams data)
+    {
+        await jSReference.InvokeVoidAsync("write", data);
+    }
+    public async Task SeekAsync(ulong position)
+    {
+        await jSReference.InvokeVoidAsync("seek", position);
+    }
+    public async Task TruncateAsync(ulong size)
+    {
+        await jSReference.InvokeVoidAsync("truncate", size);
     }
     public async Task CloseAsync()
     {
-        await JSReference.InvokeVoidAsync("close");
+        await jSReference.InvokeVoidAsync("close");
     }
 }
