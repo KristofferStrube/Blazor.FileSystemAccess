@@ -65,6 +65,7 @@ else
             await writable.CloseAsync();
             file = await fileHandle.GetFileAsync();
             fileText = await file.TextAsync();
+            keyInput = key;
             StateHasChanged();
         }
     }
