@@ -4,7 +4,9 @@
 <PageTitle>File System Access Support Check</PageTitle>
 
 <h2>
-    The File System Access API is @(IsSupported ? "" : "not") supported in this browser.
+    <span class="badge @(IsSupported ? "bg-success" : "bg-alert")">
+        The File System Access API is @(IsSupported ? "" : "not") supported in this browser.
+    </span>
 </h2>
 
 
