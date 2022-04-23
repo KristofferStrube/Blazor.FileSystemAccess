@@ -35,4 +35,14 @@ public class FileSystemDirectoryHandle : FileSystemHandle
         IJSObjectReference? jSFileSystemDirectoryHandle = await JSReference.InvokeAsync<IJSObjectReference>("getDirectoryHandle", name, options);
         return new FileSystemDirectoryHandle(jSFileSystemDirectoryHandle, helper);
     }
+
+    public async Task RemoveEntryAsync(string name, FileSystemGetFileOptions? options = null)
+    {
+        await JSReference.InvokeVoidAsync("removeEntry", name, options);
+    }
+
+    public async Task<string[]?> ResolveAsync(FileSystemHandle possibleDescendant)
+    {
+        return await JSReference.InvokeAsync<string[]?>("resolve", possibleDescendant.JSReference);
+    }  
 }
