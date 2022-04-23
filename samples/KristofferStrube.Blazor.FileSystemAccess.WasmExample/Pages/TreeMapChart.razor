@@ -13,7 +13,7 @@ else
     <br />
     @if (hoverItem != null)
     {
-        <b>@Path(hoverItem.Handle) / @hoverItem.Name: </b> @ReadableByteSize(Size(hoverItem))
+        <b>@hoverItemPath: </b> @ReadableByteSize(Size(hoverItem))
     }
     <br />
     <div style="height:calc(100% - 70px);">
@@ -21,22 +21,24 @@ else
                   QuantityMapper="item => Size(item)"
                   LabelMapper=@(item => "")
                   FillMapper="item => Rainbow(rootEntity.Children.OrderBy(e => e.Size).ToList().IndexOf(rootEntity.Children.First(e => e.ColorIndex == item.ColorIndex)), rootEntity.Children.Count)"
-                  OnMouseOver="item => {hoverItem = item; StateHasChanged();}"
+                  OnMouseOver="SelectHoverItem"
                   OnMouseOut="item =>  {hoverItem = null; StateHasChanged();}"
                   Children="item => item.Children"
-                  IsLeaf="item => item is { Children: { Count: 0 } }"
-                  Padding="1"/>
+                  IsLeaf="item => item.Kind is FileSystemHandleKind.File"
+                  Padding="1" />
     </div>
 }
 
 @code {
     private Entity? hoverItem;
 
-    private Entity rootEntity = new(FileSystemHandleKind.Directory, null, "Root", 0);
+    private Entity rootEntity = new(FileSystemHandleKind.Directory, null, 0);
 
     private FileSystemDirectoryHandle? directoryHandle = null;
 
     private int entitiesChecked;
+
+    private string hoverItemPath = "";
 
     protected async Task OpenDictoryPicker()
     {
@@ -68,7 +70,7 @@ else
         for (int i = 0; i < values.Count(); i++)
         {
             var value = values[i];
-            var entity = new Entity(value.Kind, value, value.Name, i);
+            var entity = new Entity(value.Kind, value, i);
             rootEntity.Children.Add(entity);
             queue.Enqueue((entity, directoryHandle, value));
             StateHasChanged();
@@ -89,7 +91,7 @@ else
                 var innerValues = await fileSystemDirectoryHandle.ValuesAsync();
                 foreach (var innerValue in innerValues)
                 {
-                    var innerEntity = new Entity(innerValue.Kind, innerValue, innerValue.Name, entity.ColorIndex);
+                    var innerEntity = new Entity(innerValue.Kind, innerValue, entity.ColorIndex);
                     entity.Children.Add(innerEntity);
                     queue.Enqueue((innerEntity, fileSystemDirectoryHandle, innerValue));
                 }
@@ -100,17 +102,15 @@ else
 
     protected class Entity
     {
-        public Entity(FileSystemHandleKind Kind, FileSystemHandle Handle, string Name, int ColorIndex)
+        public Entity(FileSystemHandleKind Kind, FileSystemHandle Handle, int ColorIndex)
         {
             this.Kind = Kind;
             this.Handle = Handle;
-            this.Name = Name;
             this.ColorIndex = ColorIndex;
             Children = new();
         }
         public FileSystemHandleKind Kind { get; set; }
         public FileSystemHandle Handle { get; set; }
-        public string Name { get; set; }
         public ulong Size { get; set; }
         public List<Entity> Children { get; set; }
         public int ColorIndex { get; set; }
@@ -156,8 +156,13 @@ else
         };
     }
 
-    protected async Task<string> Path(FileSystemHandle handle)
+    protected async void SelectHoverItem(Entity item)
     {
-        return string.Join("/", await directoryHandle.ResolveAsync(handle) ?? new string[] { "" });
+        hoverItem = item;
+        if (directoryHandle is not null)
+        {
+            hoverItemPath = string.Join("/", await directoryHandle.ResolveAsync(item.Handle) ?? new string[] { "" });
+        }
+        StateHasChanged();
     }
 }
