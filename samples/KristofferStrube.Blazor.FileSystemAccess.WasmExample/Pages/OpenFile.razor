@@ -1,0 +1,92 @@
+﻿@page "/OpenFile"
+@inject FileSystemAccessService FileSystemAccessService
+
+<PageTitle>Read File</PageTitle>
+
+@if (fileHandle is null)
+{
+    <button @onclick="OpenFilePicker" class="btn btn-primary">Open File Picker for Single File</button>
+}
+else if (readPermissionState is PermissionState.Denied)
+{
+    <button @onclick="RequestReadAccess" class="btn btn-primary">Request Read Access for @fileHandle.Name</button>
+}
+else if (fileText is null)
+{
+    <button @onclick="ReadFile" class="btn btn-primary">Read @fileHandle.Name</button>
+}
+else if (writePermissionState is PermissionState.Denied or PermissionState.Prompt)
+{
+    <button @onclick="RequestWriteAccess" class="btn btn-primary">Request Write Access for @fileHandle.Name</button>
+    <textarea style="width:100%;height:calc(100% - 44px);" value=@fileText @oninput=TextAreaChanged disabled="disabled"></textarea>
+}
+else
+{
+    <textarea style="width:100%;height:calc(100% - 6px);" value=@fileText @oninput=TextAreaChanged></textarea>
+}
+
+
+@code {
+    private string? fileText;
+    private FileSystemFileHandle? fileHandle;
+    private PermissionState readPermissionState;
+    private PermissionState writePermissionState;
+
+    private async Task OpenFilePicker()
+    {
+        try
+        {
+            var options = new OpenFilePickerOptions() { Multiple = false, StartIn = WellKnownDirectory.Downloads };
+            var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
+            fileHandle = fileHandles.Single();
+        }
+        catch (JSException ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            if (fileHandle != null)
+            {
+                readPermissionState = await fileHandle.QueryPermission(new() { Mode = FileSystemPermissionMode.Read });
+            }
+        }
+    }
+
+    private async Task RequestReadAccess()
+    {
+        if (fileHandle is null) return;
+        readPermissionState = await fileHandle.RequestPermission(new() { Mode = FileSystemPermissionMode.Read });
+    }
+
+    private async Task ReadFile()
+    {
+        if (fileHandle is null) return;
+        Console.WriteLine($"Name: {fileHandle.Name}");
+        Console.WriteLine($"Kind: {fileHandle.Kind}");
+        Console.WriteLine($"Is Same as Self: {await fileHandle.IsSameEntryAsync(fileHandle)}");
+        var file = await fileHandle.GetFileAsync();
+        Console.WriteLine($"File Name: {file.Name}");
+        Console.WriteLine($"File LastModified: {file.LastModified.ToString()}");
+        Console.WriteLine($"File Size: {file.Size}");
+        Console.WriteLine($"File Type: {file.Type}");
+        fileText = await file.TextAsync();
+        writePermissionState = await fileHandle.QueryPermission(new() { Mode = FileSystemPermissionMode.ReadWrite });
+    }
+
+    private async Task RequestWriteAccess()
+    {
+        if (fileHandle is null) return;
+        writePermissionState = await fileHandle.RequestPermission(new() { Mode = FileSystemPermissionMode.ReadWrite });
+    }
+
+    private async Task TextAreaChanged(ChangeEventArgs eventArgs)
+    {
+        if (fileHandle is not null && eventArgs.Value is string value)
+        {
+            var writable = await fileHandle.CreateWritableAsync();
+            await writable.WriteAsync(value);
+            await writable.CloseAsync();
+        }
+    }
+}

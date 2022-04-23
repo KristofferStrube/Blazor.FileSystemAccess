@@ -58,6 +58,18 @@ public class FileSystemAccessService : IAsyncDisposable
         return new FileSystemDirectoryHandle(jSFileHandle, helper);
     }
 
+    /// <summary>
+    /// Meta method for the wrapper that checks if the API is available in the current browser.
+    /// </summary>
+    /// <returns></returns>
+    public async Task<bool> IsSupported()
+    {
+        return
+            await jSRuntime.InvokeAsync<bool>("window.hasOwnProperty", "showOpenFilePicker") &
+            await jSRuntime.InvokeAsync<bool>("window.hasOwnProperty", "showSaveFilePicker") &
+            await jSRuntime.InvokeAsync<bool>("window.hasOwnProperty", "showDirectoryPicker");
+
+    }
 
     public async ValueTask DisposeAsync()
     {
