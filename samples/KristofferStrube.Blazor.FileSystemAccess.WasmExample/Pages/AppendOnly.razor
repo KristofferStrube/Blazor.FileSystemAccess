@@ -23,7 +23,7 @@ else
     private const string allowedChars = "abcdefghijklmnopqrstuvxyz";
     private string? fileText;
     private int cursorPosition;
-    private string keyInput;
+    private string? keyInput;
     private FileSystemFileHandle? fileHandle;
     private PermissionState writePermissionState = PermissionState.Denied;
 
@@ -31,7 +31,7 @@ else
     {
         try
         {
-            var options = new OpenFilePickerOptions() { Multiple = false, StartIn = WellKnownDirectory.Downloads };
+            var options = new OpenFilePickerOptionsStartInWellKnownDirectory() { Multiple = false, StartIn = WellKnownDirectory.Downloads };
             var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
             fileHandle = fileHandles.Single();
         }
@@ -59,7 +59,10 @@ else
         {
             var file = await fileHandle.GetFileAsync();
             var writable = await fileHandle.CreateWritableAsync();
-            await writable.WriteAsync(fileText);
+            if (fileText is not null)
+            {
+                await writable.WriteAsync(fileText);
+            }
             await writable.SeekAsync((ulong)cursorPosition);
             await writable.WriteAsync(key);
             await writable.CloseAsync();

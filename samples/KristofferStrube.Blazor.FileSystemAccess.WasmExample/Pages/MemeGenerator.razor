@@ -57,7 +57,7 @@
     {
         try
         {
-            var options = new OpenFilePickerOptions()
+            var options = new OpenFilePickerOptionsStartInWellKnownDirectory()
                 {
                     Types = new FilePickerAcceptType[] {
                         new FilePickerAcceptType() {
@@ -152,7 +152,7 @@
         try
         {
             var suggestedName = fileHandle is null ? "meme" : "meme_" + fileHandle.Name;
-            var options = new SaveFilePickerOptions()
+            var options = new SaveFilePickerOptionsStartInWellKnownDirectory()
                 {
                     StartIn = WellKnownDirectory.Pictures,
                     SuggestedName = suggestedName

@@ -44,7 +44,7 @@ else
     {
         try
         {
-            var options = new DirectoryPickerOptions() { StartIn = WellKnownDirectory.Pictures };
+            var options = new DirectoryPickerOptionsStartInWellKnownDirectory() { StartIn = WellKnownDirectory.Pictures };
             directoryHandle = await FileSystemAccessService.ShowDirectoryPickerAsync(options);
         }
         catch (JSException ex)
