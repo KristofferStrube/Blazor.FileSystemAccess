@@ -5,7 +5,7 @@
 
 [![NuGet Downloads (official NuGet)](https://img.shields.io/nuget/dt/KristofferStrube.Blazor.FileSystemAccess?label=NuGet%20Downloads)](https://www.nuget.org/packages/KristofferStrube.Blazor.FileSystemAccess/)  
 
-# Blazor.FileSystemAccess
+# Introduction
 A Blazor wrapper for the browser API [File System Access](https://wicg.github.io/file-system-access)
 
 The API makes it possible to read and write to your local file system from the browser both files and directories. The API is supported on a limited set of browsers. Most noticeable not supported on Chrome for Android phones yet nor browsers on Apple mobile products.
