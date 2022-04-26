@@ -1,3 +1,10 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](/LICENSE.md)
+[![GitHub issues](https://img.shields.io/github/issues/KristofferStrube/Blazor.FileSystemAccess)](https://github.com/KristofferStrube/Blazor.FileSystemAccess/issues)
+[![GitHub forks](https://img.shields.io/github/forks/KristofferStrube/Blazor.FileSystemAccess)](https://github.com/KristofferStrube/Blazor.FileSystemAccess/network/members)
+[![GitHub stars](https://img.shields.io/github/stars/KristofferStrube/Blazor.FileSystemAccess)](https://github.com/KristofferStrube/Blazor.FileSystemAccess/stargazers)
+
+[![NuGet Downloads (official NuGet)](https://img.shields.io/nuget/dt/KristofferStrube.Blazor.FileSystemAccess?label=NuGet%20Downloads)](https://www.nuget.org/packages/KristofferStrube.Blazor.FileSystemAccess/)  
+
 # Blazor.FileSystemAccess
 A Blazor wrapper for the browser API [File System Access](https://wicg.github.io/file-system-access)
 
