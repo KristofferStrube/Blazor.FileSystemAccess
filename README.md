@@ -98,7 +98,7 @@ Then you can use `FileSystemAccessService` to open one of the three dialogs avai
 Feel free to open issues on the repository if you find any errors with the package or have wishes for features.
 
 # Related articles
-This repository was build on top of the work done in the following series of articles:
+This repository was build with inspiration and help from the following series of articles:
 
 - [Wrapping JavaScript libraries in Blazor WebAssembly/WASM](https://blog.elmah.io/wrapping-javascript-libraries-in-blazor-webassembly-wasm/)
 - [Call anonymous C# functions from JS in Blazor WASM](https://blog.elmah.io/call-anonymous-c-functions-from-js-in-blazor-wasm/)
