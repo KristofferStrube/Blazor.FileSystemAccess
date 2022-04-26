@@ -55,6 +55,26 @@ public class FileSystemAccessService : IAsyncDisposable
     }
 
     /// <summary>
+    /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
+    /// </summary>
+    /// <param name="openFilePickerOptions"></param>
+    /// <returns></returns>
+    public async Task<FileSystemFileHandle[]> ShowOpenFilePickerAsync()
+    {
+        IJSInProcessObjectReference helper = await helperTask.Value;
+        IJSObjectReference? jSFileHandles = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showOpenFilePicker");
+        int length = await helper.InvokeAsync<int>("size", jSFileHandles);
+        return await Task.WhenAll(
+            Enumerable
+                .Range(0, length)
+                .Select(async i =>
+                    new FileSystemFileHandle(await jSFileHandles.InvokeAsync<IJSObjectReference>("at", i), helper)
+                )
+                .ToArray()
+        );
+    }
+
+    /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showsavefilepicker">showSaveFilePicker() browser specs</see>
     /// </summary>
     /// <param name="saveFilePickerOptions"></param>

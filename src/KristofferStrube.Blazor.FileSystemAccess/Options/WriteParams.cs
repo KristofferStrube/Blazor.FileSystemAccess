@@ -21,7 +21,7 @@ public class BlobWriteParams
     public ulong Position { get; set; }
 
     [JsonIgnore]
-    public Blob Data { get; set; }
+    public Blob? Data { get; set; }
 }
 
 public class StringWriteParams
@@ -43,5 +43,5 @@ public class StringWriteParams
     public ulong Position { get; set; }
 
     [JsonPropertyName("data")]
-    public string Data { get; set; }
+    public string? Data { get; set; }
 }

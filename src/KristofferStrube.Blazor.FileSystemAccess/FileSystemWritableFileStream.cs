@@ -26,7 +26,7 @@ public class FileSystemWritableFileStream
     }
     public async Task WriteAsync(BlobWriteParams data)
     {
-        await helper.InvokeVoidAsync("WriteBlobWriteParams", jSReference, data, data.Data.JSReference);
+        await helper.InvokeVoidAsync("WriteBlobWriteParams", jSReference, data, data.Data?.JSReference);
     }
     public async Task WriteAsync(StringWriteParams data)
     {
