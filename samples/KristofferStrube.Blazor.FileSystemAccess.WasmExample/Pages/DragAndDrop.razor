@@ -1,0 +1,48 @@
+﻿@page "/DragAndDrop"
+@inject FileSystemAccessService FileSystemAccessService
+@inject IJSRuntime IJSRuntime
+
+<div
+    @ref="DropElementReference"
+    style="border:dotted 2px black; height:300px;align-content:center;text-align:center;"
+     @ondragover="DragOver"
+     @ondrop="DragEnd">
+    @Name
+</div>
+
+@code {
+    private string Name { get; set; } = "Drop a single file here!";
+
+    private ElementReference DropElementReference { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await IJSRuntime.InvokeVoidAsync("preventDefaultDragOverHandler", DropElementReference);
+        }
+    }
+
+    private void DragOver(DragEventArgs eventArgs)
+    {
+        
+    }
+
+    private async void DragEnd(DragEventArgs eventArgs)
+    {
+        DataTransferItem? dataTransferItem = null;
+        if (eventArgs.DataTransfer.Items.Length > 0 && eventArgs.DataTransfer.Items[0].Kind == "file")
+        {
+            dataTransferItem = eventArgs.DataTransfer.Items[0];
+        }
+
+        if (dataTransferItem is not null)
+        {
+            FileSystemHandle? fileHandle = await FileSystemAccessService.GetAsFileSystemHandle(dataTransferItem);
+            if (fileHandle is not null)
+            {
+                Name = fileHandle.Name;
+            }
+        }
+    }
+}

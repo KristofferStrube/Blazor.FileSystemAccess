@@ -10,7 +10,13 @@ export async function arrayFrom(values) {
     return res;
 }
 
-export function WriteBlobWriteParams(fileSystemWritableFileStream, writeParams, blob) {
+export function writeBlobWriteParams(fileSystemWritableFileStream, writeParams, blob) {
     writeParams.data = blob;
     fileSystemWritableFileStream.write(writeParams);
+}
+
+export function getAsFileSystemHandle(dataTransferItem) {
+    console.log(dataTransferItem);
+    console.log(dataTransferItem.getAsString());
+    return dataTransferItem.getAsFileSystemHandle();
 }

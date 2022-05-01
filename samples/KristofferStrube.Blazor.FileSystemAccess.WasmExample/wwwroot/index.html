@@ -54,6 +54,14 @@
                 quality = 1);
             return blobWrapper;
         }
+        function preventDefaultDragOverHandler(element) {
+            element.addEventListener("dragover", ev => {
+                ev.preventDefault();
+            });
+            element.addEventListener("drop", ev => {
+                ev.preventDefault();
+            });
+        }
     </script>
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />

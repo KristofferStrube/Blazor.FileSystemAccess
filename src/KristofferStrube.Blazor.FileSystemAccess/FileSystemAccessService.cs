@@ -1,4 +1,5 @@
 using KristofferStrube.Blazor.FileSystemAccess.Extensions;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
@@ -157,6 +158,20 @@ public class FileSystemAccessService : IAsyncDisposable
             await jSRuntime.InvokeAsync<bool>("window.hasOwnProperty", "showSaveFilePicker") &
             await jSRuntime.InvokeAsync<bool>("window.hasOwnProperty", "showDirectoryPicker");
 
+    }
+
+    public async Task<FileSystemHandle?> GetAsFileSystemHandle(DataTransferItem dataTransferItem)
+    {
+        IJSInProcessObjectReference helper = await helperTask.Value;
+        IJSObjectReference? jSFileHandle = await helper.InvokeAsync<IJSObjectReference?>("getAsFileSystemHandle", dataTransferItem);
+        if (jSFileHandle is null)
+        {
+            return null;
+        }
+        else
+        {
+            return new FileSystemHandle(jSFileHandle, helper);
+        }
     }
 
     public async ValueTask DisposeAsync()
