@@ -121,9 +121,8 @@
 
     protected async Task WriteCanvasSize(ChangeEventArgs eventArgs)
     {
-        if (eventArgs.Value is string size)
+        if (eventArgs.Value is string size && double.TryParse(size, out canvasSize))
         {
-            canvasSize = double.Parse(size);
             await WriteText();
         }
     }
