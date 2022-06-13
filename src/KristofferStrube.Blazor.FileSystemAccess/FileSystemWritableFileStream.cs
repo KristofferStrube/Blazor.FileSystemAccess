@@ -20,6 +20,10 @@ public class FileSystemWritableFileStream
     {
         await jSReference.InvokeVoidAsync("write", data);
     }
+    public async Task WriteAsync(byte[] data)
+    {
+        await jSReference.InvokeVoidAsync("write", data);
+    }
     public async Task WriteAsync(Blob data)
     {
         await jSReference.InvokeVoidAsync("write", data.JSReference);
@@ -29,6 +33,10 @@ public class FileSystemWritableFileStream
         await helper.InvokeVoidAsync("WriteBlobWriteParams", jSReference, data, data.Data?.JSReference);
     }
     public async Task WriteAsync(StringWriteParams data)
+    {
+        await jSReference.InvokeVoidAsync("write", data);
+    }
+    public async Task WriteAsync(ByteArrayWriteParams data)
     {
         await jSReference.InvokeVoidAsync("write", data);
     }

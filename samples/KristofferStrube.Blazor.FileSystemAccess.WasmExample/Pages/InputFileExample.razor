@@ -3,11 +3,7 @@
 
 <PageTitle>InputFile Example</PageTitle>
 
-We can currently read the bytes from a <code>IBrowserFile</code> from the native <code>InputFile</code> component and
-parse these to the <code>FileSystemWritableFileStream</code> by converting it to a string, but it would be nice if we could just
-copy the existing stream directly to the <code>FileSystemWritableFileStream</code>.
-<br />
-This can be achieved if <code>FileSystemWritableFileStream</code> extends the .NET class <code>Stream</code>.
+We can read the bytes from a <code>IBrowserFile</code> from the native <code>InputFile</code> component and write these to the <code>FileSystemWritableFileStream</code>.
 <br />
 <br />
 <InputFile OnChange="OnChange" class="btn btn-primary" />
@@ -19,7 +15,7 @@ This can be achieved if <code>FileSystemWritableFileStream</code> extends the .N
 }
 
 @code {
-    public byte[] buffer;
+    public byte[]? buffer;
 
     public async Task OnChange(InputFileChangeEventArgs args)
     {
@@ -31,16 +27,12 @@ This can be achieved if <code>FileSystemWritableFileStream</code> extends the .N
 
     public async Task Save()
     {
-        var fileHandle = await FileSystemAccessService.ShowSaveFilePickerAsync();
-        var writable = await fileHandle.CreateWritableAsync();
-        await writable.WriteAsync(BytesToString(buffer));
-        await writable.CloseAsync();
-    }
-
-    private static string BytesToString(byte[] bytes)
-    {
-        using MemoryStream stream = new MemoryStream(bytes);
-        using StreamReader streamReader = new StreamReader(stream);
-        return streamReader.ReadToEnd();
+        if(buffer is not null)
+        {
+            var fileHandle = await FileSystemAccessService.ShowSaveFilePickerAsync();
+            var writable = await fileHandle.CreateWritableAsync();
+            await writable.WriteAsync(buffer);
+            await writable.CloseAsync();
+        }
     }
 }
