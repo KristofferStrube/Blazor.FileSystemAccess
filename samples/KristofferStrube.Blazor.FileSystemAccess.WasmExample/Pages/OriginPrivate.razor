@@ -1,0 +1,40 @@
+﻿@page "/OriginPrivate"
+@inject FileSystemAccessService FileSystemAccessService
+
+<PageTitle>Origin Private</PageTitle>
+
+Example use for the Origin Private File System which doesn't need a prompt to get its root directory handle.
+<br />
+<br />
+
+@if (fileHandle is not null)
+{
+    <textarea style="width:100%;height:calc(100% - 60px);" value=@fileText @oninput=TextAreaChanged></textarea>
+}
+
+@code {
+    private string? fileText;
+    private FileSystemFileHandle fileHandle;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var originPrivateDir = await FileSystemAccessService.GetOriginPrivateDirectory();
+            fileHandle = await originPrivateDir.GetFileHandleAsync("temp", new() { Create = true });
+            var file = await fileHandle.GetFileAsync();
+            fileText = await file.TextAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task TextAreaChanged(ChangeEventArgs eventArgs)
+    {
+        if (fileHandle is not null && eventArgs.Value is string value)
+        {
+            var writable = await fileHandle.CreateWritableAsync();
+            await writable.WriteAsync(value);
+            await writable.CloseAsync();
+        }
+    }
+}
