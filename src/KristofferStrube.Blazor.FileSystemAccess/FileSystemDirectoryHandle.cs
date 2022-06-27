@@ -36,7 +36,7 @@ public class FileSystemDirectoryHandle : FileSystemHandle
         return new FileSystemDirectoryHandle(jSFileSystemDirectoryHandle, helper);
     }
 
-    public async Task RemoveEntryAsync(string name, FileSystemGetFileOptions? options = null)
+    public async Task RemoveEntryAsync(string name, FileSystemRemoveOptions? options = null)
     {
         await JSReference.InvokeVoidAsync("removeEntry", name, options);
     }
