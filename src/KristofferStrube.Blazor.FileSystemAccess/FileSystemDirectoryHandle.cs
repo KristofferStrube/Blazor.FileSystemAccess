@@ -44,5 +44,5 @@ public class FileSystemDirectoryHandle : FileSystemHandle
     public async Task<string[]?> ResolveAsync(FileSystemHandle possibleDescendant)
     {
         return await JSReference.InvokeAsync<string[]?>("resolve", possibleDescendant.JSReference);
-    }  
+    }
 }
