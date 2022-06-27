@@ -102,7 +102,7 @@ else
 
     protected class Entity
     {
-        public Entity(FileSystemHandleKind Kind, FileSystemHandle Handle, int ColorIndex)
+        public Entity(FileSystemHandleKind Kind, FileSystemHandle? Handle, int ColorIndex)
         {
             this.Kind = Kind;
             this.Handle = Handle;
@@ -110,7 +110,7 @@ else
             Children = new();
         }
         public FileSystemHandleKind Kind { get; set; }
-        public FileSystemHandle Handle { get; set; }
+        public FileSystemHandle? Handle { get; set; }
         public ulong Size { get; set; }
         public List<Entity> Children { get; set; }
         public int ColorIndex { get; set; }
@@ -159,7 +159,7 @@ else
     protected async void SelectHoverItem(Entity item)
     {
         hoverItem = item;
-        if (directoryHandle is not null)
+        if (directoryHandle is not null && item.Handle is FileSystemHandle)
         {
             hoverItemPath = string.Join("/", await directoryHandle.ResolveAsync(item.Handle) ?? new string[] { "" });
         }
