@@ -14,3 +14,26 @@ export function WriteBlobWriteParams(fileSystemWritableFileStream, writeParams, 
     writeParams.data = blob;
     fileSystemWritableFileStream.write(writeParams);
 }
+
+// Methods for FileSystemWritableFileStream
+
+export function close(fileSystemWritableFileStream) {
+    fileSystemWritableFileStream.close();
+}
+
+export function seek(fileSystemWritableFileStream, position) {
+    fileSystemWritableFileStream.seek(position);
+}
+
+export function truncate(fileSystemWritableFileStream, size) {
+    fileSystemWritableFileStream.seek(size);
+}
+
+export function write(fileSystemWritableFileStream, buffer, offset) {
+    var writeParams = {
+        type: "write",
+        position: offset,
+        data: buffer
+    };
+    fileSystemWritableFileStream.write(writeParams);
+}

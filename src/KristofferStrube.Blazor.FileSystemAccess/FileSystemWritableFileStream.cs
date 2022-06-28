@@ -5,10 +5,21 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 /// <summary>
 /// <see href="https://wicg.github.io/file-system-access/#api-filesystemwritablefilestream">FileSystemWritableFileStream browser specs</see>
 /// </summary>
-public class FileSystemWritableFileStream
+public class FileSystemWritableFileStream : Stream
 {
     protected readonly IJSObjectReference jSReference;
     protected readonly IJSInProcessObjectReference helper;
+
+    public override bool CanRead => false;
+
+    public override bool CanSeek => true;
+
+    public override bool CanWrite => true;
+
+    // We don't want to check the length of the file as that can change multiple times throughout the lifetime of this stream.
+    public override long Length => 0;
+
+    public override long Position { get; set; }
 
     internal FileSystemWritableFileStream(IJSObjectReference jSReference, IJSInProcessObjectReference helper)
     {
@@ -51,5 +62,36 @@ public class FileSystemWritableFileStream
     public async Task CloseAsync()
     {
         await jSReference.InvokeVoidAsync("close");
+    }
+
+    public override void Flush()
+    {
+        helper.InvokeVoid("close", jSReference);
+
+    }
+
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        throw new NotSupportedException("Reading from FileSystemWritableFileStream is not supported");
+    }
+
+    public override long Seek(long offset, SeekOrigin origin)
+    {
+        if (origin is not SeekOrigin.Begin)
+        {
+            throw new NotSupportedException("We only support seeking from the start of the file");
+        }
+        helper.InvokeVoid("seek", jSReference, offset);
+        return offset;
+    }
+
+    public override void SetLength(long value)
+    {
+        helper.InvokeVoid("truncate", jSReference, value);
+    }
+
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+        helper.InvokeVoid("write", jSReference, buffer[offset..(offset+count)], offset);
     }
 }
