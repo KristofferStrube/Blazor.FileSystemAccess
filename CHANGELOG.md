@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [1.0.1] - 2022-07-12
-### Changed
+### Fixed
 - Fixed error of `Multiple` in `OpenFilePickerOptionsStartInWellKnownDirectory` not being serialized correctly. By [@AlexanderNorup](https://github.com/AlexanderNorup).
 
 ## [1.0.0] - 2022-06-28
