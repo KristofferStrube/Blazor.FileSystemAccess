@@ -12,7 +12,7 @@ public class OpenFilePickerOptionsStartInWellKnownDirectory : FilePickerOptionsS
     internal new ExpandoObject Serializable()
     {
         dynamic res = base.Serializable();
-        if (!Multiple)
+        if (Multiple)
         {
             res.multiple = Multiple;
         }
@@ -31,7 +31,7 @@ public class OpenFilePickerOptionsStartInInFileSystemHandle : FilePickerOptionsS
     internal new ExpandoObject Serializable()
     {
         dynamic res = base.Serializable();
-        if (!Multiple)
+        if (Multiple)
         {
             res.multiple = Multiple;
         }
