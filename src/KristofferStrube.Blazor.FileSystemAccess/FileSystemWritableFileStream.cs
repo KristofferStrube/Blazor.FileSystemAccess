@@ -7,7 +7,7 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 /// </summary>
 public class FileSystemWritableFileStream : Stream
 {
-    protected readonly IJSObjectReference jSReference;
+    protected readonly IJSInProcessObjectReference jSReference;
     protected readonly IJSInProcessObjectReference helper;
 
     public override bool CanRead => false;
@@ -23,7 +23,7 @@ public class FileSystemWritableFileStream : Stream
 
     internal FileSystemWritableFileStream(IJSObjectReference jSReference, IJSInProcessObjectReference helper)
     {
-        this.jSReference = jSReference;
+        this.jSReference = (IJSInProcessObjectReference)jSReference;
         this.helper = helper;
     }
 
@@ -59,6 +59,7 @@ public class FileSystemWritableFileStream : Stream
     {
         await jSReference.InvokeVoidAsync("truncate", size);
     }
+
     public async Task CloseAsync()
     {
         await jSReference.InvokeVoidAsync("close");
@@ -66,8 +67,12 @@ public class FileSystemWritableFileStream : Stream
 
     public override void Flush()
     {
-        helper.InvokeVoid("close", jSReference);
+        jSReference.InvokeVoid("close");
+    }
 
+    public override void Close()
+    {
+        jSReference.InvokeVoid("close");
     }
 
     public override int Read(byte[] buffer, int offset, int count)
@@ -81,17 +86,23 @@ public class FileSystemWritableFileStream : Stream
         {
             throw new NotSupportedException("We only support seeking from the start of the file");
         }
-        helper.InvokeVoid("seek", jSReference, offset);
+        jSReference.InvokeVoid("seek", offset);
         return offset;
     }
 
     public override void SetLength(long value)
     {
-        helper.InvokeVoid("truncate", jSReference, value);
+        jSReference.InvokeVoid("truncate", value);
     }
 
     public override void Write(byte[] buffer, int offset, int count)
     {
-        helper.InvokeVoid("write", jSReference, buffer[offset..(offset+count)], offset);
+        jSReference.InvokeVoid("seek", offset);
+        jSReference.InvokeVoid("write", buffer[..count]);
+    }
+
+    public override async ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        await jSReference.InvokeVoidAsync("write", buffer.ToArray());
     }
 }

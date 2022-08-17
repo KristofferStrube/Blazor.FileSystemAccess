@@ -6,29 +6,37 @@
 We can read the bytes from a <code>IBrowserFile</code> from the native <code>InputFile</code> component and write these to the <code>FileSystemWritableFileStream</code>.
 <br />
 <br />
-@if (SaveFileHandle is null)
+@if (readFile is not null)
 {
-    <button class="btn btn-primary" @onclick=Save>Choose File to Save to</button>
+    <h3>Currently streaming...</h3>
+}
+else if (SaveFileHandle is not null)
+{
+    <text>Choose file to Stream From</text>
+    <br />
+    <InputFile OnChange="OnChange" />
 }
 else
 {
-    <InputFile OnChange="OnChange" class="btn btn-primary" />
+    <button class="btn btn-primary" @onclick=Save>Choose File to Stream To</button>
 }
 
 @code {
     FileSystemFileHandle? SaveFileHandle;
+    IBrowserFile? readFile;
 
     public async Task OnChange(InputFileChangeEventArgs args)
     {
         if (SaveFileHandle is not null)
         {
-            var file = args.File;
-            using var stream = file.OpenReadStream();
-            var writable = await SaveFileHandle.CreateWritableAsync(new() { KeepExistingData = false });
+            readFile = args.File;
+            
+            using var stream = readFile.OpenReadStream(maxAllowedSize: 10000000000);
+            using var writable = await SaveFileHandle.CreateWritableAsync(new() { KeepExistingData = false });
             await stream.CopyToAsync(writable);
-            var saveFile = await SaveFileHandle.GetFileAsync();
-            var text = await saveFile.TextAsync();
-            Console.WriteLine(text);
+            SaveFileHandle = null;
+            readFile = null;
+            Console.WriteLine("Done streaming!");
         }
     }
 
