@@ -27,34 +27,69 @@ public class FileSystemWritableFileStream : Stream
         this.helper = helper;
     }
 
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+        jSReference.InvokeVoid("seek", offset);
+        jSReference.InvokeVoid("write", buffer[..count]);
+    }
+
+    public override async ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        await jSReference.InvokeVoidAsync("write", buffer.ToArray());
+    }
+
     public async Task WriteAsync(string data)
     {
         await jSReference.InvokeVoidAsync("write", data);
     }
+
     public async Task WriteAsync(byte[] data)
     {
         await jSReference.InvokeVoidAsync("write", data);
     }
+
     public async Task WriteAsync(Blob data)
     {
         await jSReference.InvokeVoidAsync("write", data.JSReference);
     }
+
     public async Task WriteAsync(BlobWriteParams data)
     {
         await helper.InvokeVoidAsync("WriteBlobWriteParams", jSReference, data, data.Data?.JSReference);
     }
+
     public async Task WriteAsync(StringWriteParams data)
     {
         await jSReference.InvokeVoidAsync("write", data);
     }
+
     public async Task WriteAsync(ByteArrayWriteParams data)
     {
         await jSReference.InvokeVoidAsync("write", data);
     }
+
+    public override long Seek(long offset, SeekOrigin origin)
+    {
+        if (origin is not SeekOrigin.Begin)
+        {
+            throw new NotSupportedException("We only support seeking from the start of the file");
+        }
+        Position = offset;
+        jSReference.InvokeVoid("seek", offset);
+        return offset;
+    }
+
     public async Task SeekAsync(ulong position)
     {
+        Position = (long)position;
         await jSReference.InvokeVoidAsync("seek", position);
     }
+
+    public override void SetLength(long value)
+    {
+        jSReference.InvokeVoid("truncate", value);
+    }
+
     public async Task TruncateAsync(ulong size)
     {
         await jSReference.InvokeVoidAsync("truncate", size);
@@ -78,31 +113,5 @@ public class FileSystemWritableFileStream : Stream
     public override int Read(byte[] buffer, int offset, int count)
     {
         throw new NotSupportedException("Reading from FileSystemWritableFileStream is not supported");
-    }
-
-    public override long Seek(long offset, SeekOrigin origin)
-    {
-        if (origin is not SeekOrigin.Begin)
-        {
-            throw new NotSupportedException("We only support seeking from the start of the file");
-        }
-        jSReference.InvokeVoid("seek", offset);
-        return offset;
-    }
-
-    public override void SetLength(long value)
-    {
-        jSReference.InvokeVoid("truncate", value);
-    }
-
-    public override void Write(byte[] buffer, int offset, int count)
-    {
-        jSReference.InvokeVoid("seek", offset);
-        jSReference.InvokeVoid("write", buffer[..count]);
-    }
-
-    public override async ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
-    {
-        await jSReference.InvokeVoidAsync("write", buffer.ToArray());
     }
 }
