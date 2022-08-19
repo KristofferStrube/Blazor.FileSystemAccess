@@ -6,33 +6,43 @@
 We can read the bytes from a <code>IBrowserFile</code> from the native <code>InputFile</code> component and write these to the <code>FileSystemWritableFileStream</code>.
 <br />
 <br />
-<InputFile OnChange="OnChange" class="btn btn-primary" />
-@if (buffer is not null)
+@if (readFile is not null)
 {
+    <h3>Currently streaming...</h3>
+}
+else if (SaveFileHandle is not null)
+{
+    <text>Choose file to Stream From</text>
     <br />
-    <br />
-    <button class="btn btn-success" @onclick="Save">Save</button>
+    <InputFile OnChange="OnChange" />
+}
+else
+{
+    <button class="btn btn-primary" @onclick=Save>Choose File to Stream To</button>
 }
 
 @code {
-    public byte[]? buffer;
+    FileSystemFileHandle? SaveFileHandle;
+    IBrowserFile? readFile;
 
     public async Task OnChange(InputFileChangeEventArgs args)
     {
-        var file = args.File;
-        using var stream = file.OpenReadStream();
-        buffer = new byte[stream.Length];
-        await stream.ReadAsync(buffer);
+        if (SaveFileHandle is not null)
+        {
+            readFile = args.File;
+            
+            using var stream = readFile.OpenReadStream(maxAllowedSize: 10000000000);
+            using var writable = await SaveFileHandle.CreateWritableAsync(new() { KeepExistingData = false });
+            await stream.CopyToAsync(writable);
+            SaveFileHandle = null;
+            readFile = null;
+            Console.WriteLine("Done streaming!");
+        }
     }
 
     public async Task Save()
     {
-        if(buffer is not null)
-        {
-            var fileHandle = await FileSystemAccessService.ShowSaveFilePickerAsync();
-            var writable = await fileHandle.CreateWritableAsync();
-            await writable.WriteAsync(buffer);
-            await writable.CloseAsync();
-        }
+        SaveFileHandle = await FileSystemAccessService.ShowSaveFilePickerAsync();
+        StateHasChanged();
     }
 }
