@@ -6,13 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0]
+### Added
+- `FileSystemWritableStream` now extends the `Stream`.
+
 ## [1.0.1] - 2022-07-12
 ### Fixed
 - Fixed error of `Multiple` in `OpenFilePickerOptionsStartInWellKnownDirectory` not being serialized correctly. By [@AlexanderNorup](https://github.com/AlexanderNorup).
 
 ## [1.0.0] - 2022-06-28
-### Added
-- `FileSystemWritableStream` now extends the `Stream`.
 ### Added
 - Added support for Origin Private File System via `GetOriginPrivateDirectory` method that wraps the JS call `navigator.storage.getDirectory`.
 ### Changed
