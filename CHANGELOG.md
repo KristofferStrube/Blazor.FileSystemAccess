@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- `FileSystemWritableStream` now extends the `Stream`.
+### Added
 - Added support for Origin Private File System via `GetOriginPrivateDirectory` method that wraps the JS call `navigator.storage.getDirectory`.
 ### Changed
 - Changed `RemoveEntryAsync` to use `FileSystemRemoveOptions` instead of `FileSystemGetFileOptions` and created the `FileSystemRemoveOptions` class.
