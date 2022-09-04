@@ -1,7 +1,7 @@
 @page "/MultipleFiles"
 @inject FileSystemAccessService FileSystemAccessService
 
-<PageTitle>Open Multiple Files</PageTitle>
+<PageTitle>File System Access - Open Multiple Files</PageTitle>
 
 <button @onclick="OpenMultipleFilePicker" class="btn btn-primary">Open File Picker for Multiple Files</button>
 
@@ -17,7 +17,7 @@
 }
 
 @code {
-    private List<string> filesRead;
+    private List<string>? filesRead;
 
     private async Task OpenMultipleFilePicker()
     {

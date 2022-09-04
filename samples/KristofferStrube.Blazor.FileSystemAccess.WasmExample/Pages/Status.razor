@@ -1,0 +1,206 @@
+﻿@page "/Status"
+
+@using HtmlAgilityPack;
+
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+
+<PageTitle>File System Access - Status</PageTitle>
+
+@if (compareText is not null)
+{
+    <pre><code>
+            @((MarkupString)compareText)
+            </code></pre>
+}
+else
+{
+    <text>Loading WebIDL from specs ...</text>
+}
+
+@code {
+    private string compareText;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var domString = await HttpClient.GetStringAsync("https://wicg.github.io/file-system-access/");
+
+            var dom = new HtmlDocument();
+            dom.LoadHtml(domString);
+            var idlIndexHeader = dom.GetElementbyId("idl-index");
+            var webIDLNode = idlIndexHeader.NextSibling.NextSibling;
+            var webIDLText = webIDLNode.InnerText;
+            // We normalize to indent with 4 spaces as that is inconsistent in the current WebIDL specs.
+            var fetchedLines = webIDLText.Replace("    ", "  ").Replace("\n  ", "\n    ").Split('\n');
+            var supportedLines = currentlySupportedWebIDL.Replace("<", "&lt;").Split('\n');
+            var compareLines = new List<string>();
+            var fetchedIndex = 0;
+            var supportedIndex = 0;
+            while (fetchedIndex < fetchedLines.Length || supportedIndex < supportedLines.Length)
+            {
+                if (fetchedIndex == fetchedLines.Length)
+                {
+                    compareLines.Add($"""<span style="background-color:blue;">{supportedLines[supportedIndex]}</span>""");
+                    supportedIndex++;
+                }
+                else if (supportedIndex == supportedLines.Length)
+                {
+                    compareLines.Add($"""<span style="background-color:orange;">{fetchedLines[fetchedIndex]}</span>""");
+                    fetchedIndex++;
+                }
+                else if (fetchedLines[fetchedIndex].Trim() == supportedLines[supportedIndex].Trim())
+                {
+                    compareLines.Add($"""<span style="background-color:lightgreen;">{fetchedLines[fetchedIndex]}</span>""");
+                    fetchedIndex++;
+                    supportedIndex++;
+                }
+                else
+                {
+                    compareLines.Add($"""<span style="background-color:pink;">{fetchedLines[fetchedIndex]}</span>""");
+                    fetchedIndex++;
+                }
+            }
+            compareText = string.Join("\n", compareLines);
+            StateHasChanged();
+        }
+    }
+
+    private const string currentlySupportedWebIDL =
+        @"enum FileSystemPermissionMode {
+    ""read"",
+    ""readwrite""
+};
+
+dictionary FileSystemPermissionDescriptor : PermissionDescriptor {
+    required FileSystemHandle handle;
+    FileSystemPermissionMode mode = ""read"";
+};
+
+dictionary FileSystemHandlePermissionDescriptor {
+    FileSystemPermissionMode mode = ""read"";
+};
+
+enum FileSystemHandleKind {
+    ""file"",
+    ""directory"",
+};
+
+[Exposed=(Window,Worker), SecureContext, Serializable]
+interface FileSystemHandle {
+    readonly attribute FileSystemHandleKind kind;
+    readonly attribute USVString name;
+
+    Promise<boolean> isSameEntry(FileSystemHandle other);
+
+    Promise<PermissionState> queryPermission(optional FileSystemHandlePermissionDescriptor descriptor = {});
+    Promise<PermissionState> requestPermission(optional FileSystemHandlePermissionDescriptor descriptor = {});
+};
+
+dictionary FileSystemCreateWritableOptions {
+    boolean keepExistingData = false;
+};
+
+[Exposed=(Window,Worker), SecureContext, Serializable]
+interface FileSystemFileHandle : FileSystemHandle {
+    Promise<File> getFile();
+    Promise<FileSystemWritableFileStream> createWritable(optional FileSystemCreateWritableOptions options = {});
+};
+
+dictionary FileSystemGetFileOptions {
+    boolean create = false;
+};
+
+dictionary FileSystemGetDirectoryOptions {
+    boolean create = false;
+};
+
+dictionary FileSystemRemoveOptions {
+    boolean recursive = false;
+};
+
+[Exposed=(Window,Worker), SecureContext, Serializable]
+interface FileSystemDirectoryHandle : FileSystemHandle {
+    async iterable<USVString, FileSystemHandle>;
+
+    Promise<FileSystemFileHandle> getFileHandle(USVString name, optional FileSystemGetFileOptions options = {});
+    Promise<FileSystemDirectoryHandle> getDirectoryHandle(USVString name, optional FileSystemGetDirectoryOptions options = {});
+
+    Promise<undefined> removeEntry(USVString name, optional FileSystemRemoveOptions options = {});
+
+    Promise<sequence<USVString>?> resolve(FileSystemHandle possibleDescendant);
+};
+
+enum WriteCommandType {
+    ""write"",
+    ""seek"",
+    ""truncate"",
+};
+
+dictionary WriteParams {
+    required WriteCommandType type;
+    unsigned long long? size;
+    unsigned long long? position;
+    (BufferSource or Blob or USVString)? data;
+};
+
+typedef (BufferSource or Blob or USVString or WriteParams) FileSystemWriteChunkType;
+
+[Exposed=(Window,Worker), SecureContext]
+interface FileSystemWritableFileStream : WritableStream {
+    Promise<undefined> write(FileSystemWriteChunkType data);
+    Promise<undefined> seek(unsigned long long position);
+    Promise<undefined> truncate(unsigned long long size);
+};
+
+enum WellKnownDirectory {
+    ""desktop"",
+    ""documents"",
+    ""downloads"",
+    ""music"",
+    ""pictures"",
+    ""videos"",
+};
+
+typedef (WellKnownDirectory or FileSystemHandle) StartInDirectory;
+
+dictionary FilePickerAcceptType {
+    USVString description;
+    record<USVString, (USVString or sequence<USVString>)> accept;
+};
+
+dictionary FilePickerOptions {
+    sequence<FilePickerAcceptType> types;
+    boolean excludeAcceptAllOption = false;
+    DOMString id;
+    StartInDirectory startIn;
+};
+
+dictionary OpenFilePickerOptions : FilePickerOptions {
+    boolean multiple = false;
+};
+
+dictionary SaveFilePickerOptions : FilePickerOptions {
+    USVString? suggestedName;
+};
+
+dictionary DirectoryPickerOptions {
+    DOMString id;
+    StartInDirectory startIn;
+    FileSystemPermissionMode mode = ""read"";
+};
+
+[SecureContext]
+partial interface Window {
+    Promise<sequence<FileSystemFileHandle>> showOpenFilePicker(optional OpenFilePickerOptions options = {});
+    Promise<FileSystemFileHandle> showSaveFilePicker(optional SaveFilePickerOptions options = {});
+    Promise<FileSystemDirectoryHandle> showDirectoryPicker(optional DirectoryPickerOptions options = {});
+};
+
+[SecureContext]
+partial interface StorageManager {
+    Promise<FileSystemDirectoryHandle> getDirectory();
+};";
+
+}
