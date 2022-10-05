@@ -1,0 +1,107 @@
+﻿@page "/ViewZipFile"
+@using System.IO.Compression
+@inject FileSystemAccessService FileSystemAccessService
+
+<PageTitle>File System Access - View Zip File</PageTitle>
+
+@if (fileHandle is null)
+{
+    <button @onclick="OpenFilePicker" class="btn btn-primary">Open Zip File</button>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">@nameof(EntryItem.FullName)</th>
+                <th scope="col">@nameof(EntryItem.Length)</th>
+                <th scope="col">@nameof(EntryItem.CompressedLength)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entry in entries)
+            {
+                <tr>
+                    <td>@entry.FullName</td>
+                    <td>@entry.Length</td>
+                    <td>@entry.CompressedLength</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private List<EntryItem> entries = new();
+    private FileSystemFileHandle? fileHandle;
+
+    struct EntryItem
+    {
+        public string FullName { get; set; }
+        public long Length { get; set; }
+        public long CompressedLength { get; set; }
+    }
+
+    private async Task OpenFilePicker()
+    {
+        try
+        {
+            var options = new OpenFilePickerOptionsStartInWellKnownDirectory
+            {
+                Types = new FilePickerAcceptType[]
+                {
+                    new FilePickerAcceptType
+                    {
+                        Description = "Zip Files",
+                        Accept = new() { { "zip/*", new string[] { ".zip", ".nupkg", ".docx" } } }
+                    }
+                },
+                Multiple = false,
+                StartIn = WellKnownDirectory.Downloads
+            };
+            var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
+            fileHandle = fileHandles.Single();
+        }
+        catch (JSException ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            if (fileHandle != null)
+            {
+                await ReadFile();
+            }
+        }
+    }
+
+    private async Task ReadFile()
+    {
+        if (fileHandle is null) return;
+
+        Console.WriteLine($"Name: {fileHandle.Name}");
+        Console.WriteLine($"Kind: {fileHandle.Kind}");
+        Console.WriteLine($"Is Same as Self: {await fileHandle.IsSameEntryAsync(fileHandle)}");
+
+        var file = await fileHandle.GetFileAsync();
+        Console.WriteLine($"File Name: {file.Name}");
+        Console.WriteLine($"File LastModified: {file.LastModified.ToString()}");
+        Console.WriteLine($"File Size: {file.Size}");
+        Console.WriteLine($"File Type: {file.Type}");
+
+        var buffer = await file.ArrayBufferAsync();
+        using var stream = new MemoryStream(buffer);
+        using var archive = new ZipArchive(stream, ZipArchiveMode.Read, true);
+
+        foreach (var entry in archive.Entries)
+        {
+            entries.Add(new EntryItem
+            {
+                FullName = entry.FullName,
+                Length = entry.Length,
+                CompressedLength = entry.CompressedLength,
+            });
+        }
+    }
+}
