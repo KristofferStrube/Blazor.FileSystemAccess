@@ -14,3 +14,9 @@ export function WriteBlobWriteParams(fileSystemWritableFileStream, writeParams, 
     writeParams.data = blob;
     fileSystemWritableFileStream.write(writeParams);
 }
+
+export async function arrayBuffer(blob) {
+  var buffer = await blob.arrayBuffer();
+  var bytes = new Uint8Array(buffer);
+  return bytes;
+}

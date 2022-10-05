@@ -34,4 +34,9 @@ public class Blob
     {
         return await JSReference.InvokeAsync<string>("text");
     }
+
+    public async Task<byte[]> ArrayBufferAsync()
+    {
+        return await helper.InvokeAsync<byte[]>("arrayBuffer", JSReference);
+    }
 }
