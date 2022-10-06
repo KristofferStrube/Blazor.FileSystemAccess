@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using KristofferStrube.Blazor.FileSystemAccess.Extensions;
+using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
@@ -9,6 +10,12 @@ public class FileSystemHandle
 {
     public readonly IJSObjectReference JSReference;
     protected readonly IJSInProcessObjectReference helper;
+
+    public static async Task<FileSystemFileHandle> CreateAsync(IJSObjectReference jSReference, IJSRuntime jSRuntime)
+    {
+        IJSInProcessObjectReference helper = await jSRuntime.GetHelperAsync();
+        return new FileSystemFileHandle(jSReference, helper);
+    }
 
     internal FileSystemHandle(IJSObjectReference jSReference, IJSInProcessObjectReference helper)
     {

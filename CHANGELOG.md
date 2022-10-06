@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Added `ArrayBufferAsync` method to `Blob` to read as byte array. By [@fixnil](https://github.com/fixnil).
+- Added public `CreateAsync` methods to `FileSystemHandle`, `FileSystemFileHandle`, and `FileSystemDirectoryHandle`.
 
 ## [1.1.0] - 2022-08-19
 ### Added
