@@ -5,7 +5,7 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 /// <summary>
 /// <see href="https://wicg.github.io/file-system-access/#dictdef-filepickeroptions">FilePickerOptions browser specs</see>
 /// </summary>
-public class FilePickerOptionsStartInWellKnownDirectory : FilePickerOptions
+public class FilePickerOptionsStartInWellKnownDirectory : BaseFilePickerOptions
 {
     public new WellKnownDirectory? StartIn { get; set; }
 }
@@ -13,12 +13,12 @@ public class FilePickerOptionsStartInWellKnownDirectory : FilePickerOptions
 /// <summary>
 /// <see href="https://wicg.github.io/file-system-access/#dictdef-filepickeroptions">FilePickerOptions browser specs</see>
 /// </summary>
-public class FilePickerOptionsStartInFileSystemHandle : FilePickerOptions
+public class FilePickerOptionsStartInFileSystemHandle : BaseFilePickerOptions
 {
     public new FileSystemHandle? StartIn { get; set; }
 }
 
-public abstract class FilePickerOptions
+public abstract class BaseFilePickerOptions
 {
     public FilePickerAcceptType[]? Types { get; set; }
     public bool ExcludeAcceptAllOption { get; set; }
