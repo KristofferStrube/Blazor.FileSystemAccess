@@ -39,7 +39,7 @@ public class FileSystemAccessService : IAsyncDisposable
     /// </summary>
     /// <param name="openFilePickerOptions"></param>
     /// <returns></returns>
-    public async Task<FileSystemFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInInFileSystemHandle? openFilePickerOptions = null)
+    public async Task<FileSystemFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions = null)
     {
         IJSInProcessObjectReference helper = await helperTask.Value;
         IJSObjectReference? jSFileHandles = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showOpenFilePicker", openFilePickerOptions?.Serializable());

@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using KristofferStrube.Blazor.FileSystemAccess.Extensions;
+using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
@@ -9,6 +10,12 @@ public class FileSystemHandle
 {
     public readonly IJSObjectReference JSReference;
     protected readonly IJSInProcessObjectReference helper;
+
+    public static async Task<FileSystemFileHandle> CreateAsync(IJSObjectReference jSReference, IJSRuntime jSRuntime)
+    {
+        IJSInProcessObjectReference helper = await jSRuntime.GetHelperAsync();
+        return new FileSystemFileHandle(jSReference, helper);
+    }
 
     internal FileSystemHandle(IJSObjectReference jSReference, IJSInProcessObjectReference helper)
     {
@@ -25,12 +32,12 @@ public class FileSystemHandle
         return await JSReference.InvokeAsync<bool>("isSameEntry", other.JSReference);
     }
 
-    public async Task<PermissionState> QueryPermission(FileSystemHandlePermissionDescriptor? description = null)
+    public async Task<PermissionState> QueryPermissionAsync(FileSystemHandlePermissionDescriptor? description = null)
     {
         return await JSReference.InvokeAsync<PermissionState>("queryPermission", description);
     }
 
-    public async Task<PermissionState> RequestPermission(FileSystemHandlePermissionDescriptor? description = null)
+    public async Task<PermissionState> RequestPermissionAsync(FileSystemHandlePermissionDescriptor? description = null)
     {
         return await JSReference.InvokeAsync<PermissionState>("requestPermission", description);
     }
