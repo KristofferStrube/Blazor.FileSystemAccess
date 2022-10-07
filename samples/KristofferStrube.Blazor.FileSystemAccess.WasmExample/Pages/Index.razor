@@ -17,7 +17,7 @@
     {
         if (firstRender)
         {
-            IsSupported = await FileSystemAccessService.IsSupported();
+            IsSupported = await FileSystemAccessService.IsSupportedAsync();
             StateHasChanged();
         }
     }

@@ -150,7 +150,7 @@ public class FileSystemAccessService : IAsyncDisposable
     /// <see href="https://wicg.github.io/file-system-access/#dom-storagemanager-getdirectory">getDirectory() for StorageManager browser specs</see>
     /// </summary>
     /// <returns></returns>
-    public async Task<FileSystemDirectoryHandle> GetOriginPrivateDirectory()
+    public async Task<FileSystemDirectoryHandle> GetOriginPrivateDirectoryAsync()
     {
         IJSInProcessObjectReference helper = await helperTask.Value;
         IJSObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("navigator.storage.getDirectory");
@@ -161,7 +161,7 @@ public class FileSystemAccessService : IAsyncDisposable
     /// Meta method for the wrapper that checks if the API is available in the current browser.
     /// </summary>
     /// <returns></returns>
-    public async Task<bool> IsSupported()
+    public async Task<bool> IsSupportedAsync()
     {
         return
             await jSRuntime.InvokeAsync<bool>("window.hasOwnProperty", "showOpenFilePicker") &

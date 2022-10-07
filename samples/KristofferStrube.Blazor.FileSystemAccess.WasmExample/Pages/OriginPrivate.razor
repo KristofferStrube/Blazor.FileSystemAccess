@@ -20,7 +20,7 @@ Example use for the Origin Private File System which doesn't need a prompt to ge
     {
         if (firstRender)
         {
-            var originPrivateDir = await FileSystemAccessService.GetOriginPrivateDirectory();
+            var originPrivateDir = await FileSystemAccessService.GetOriginPrivateDirectoryAsync();
             fileHandle = await originPrivateDir.GetFileHandleAsync("temp", new() { Create = true });
             var file = await fileHandle.GetFileAsync();
             fileText = await file.TextAsync();
