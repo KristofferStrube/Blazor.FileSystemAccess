@@ -43,7 +43,7 @@ else
         {
             if (fileHandle != null)
             {
-                writePermissionState = await fileHandle.RequestPermission(new() { Mode = FileSystemPermissionMode.ReadWrite });
+                writePermissionState = await fileHandle.RequestPermissionAsync(new() { Mode = FileSystemPermissionMode.ReadWrite });
                 if (writePermissionState is PermissionState.Granted)
                 {
                     var file = await fileHandle.GetFileAsync();

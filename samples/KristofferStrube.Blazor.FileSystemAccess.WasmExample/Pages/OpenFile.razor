@@ -48,7 +48,7 @@ else
         {
             if (fileHandle != null)
             {
-                readPermissionState = await fileHandle.QueryPermission(new() { Mode = FileSystemPermissionMode.Read });
+                readPermissionState = await fileHandle.QueryPermissionAsync(new() { Mode = FileSystemPermissionMode.Read });
             }
         }
     }
@@ -56,7 +56,7 @@ else
     private async Task RequestReadAccess()
     {
         if (fileHandle is null) return;
-        readPermissionState = await fileHandle.RequestPermission(new() { Mode = FileSystemPermissionMode.Read });
+        readPermissionState = await fileHandle.RequestPermissionAsync(new() { Mode = FileSystemPermissionMode.Read });
     }
 
     private async Task ReadFile()
@@ -71,13 +71,13 @@ else
         Console.WriteLine($"File Size: {file.Size}");
         Console.WriteLine($"File Type: {file.Type}");
         fileText = await file.TextAsync();
-        writePermissionState = await fileHandle.QueryPermission(new() { Mode = FileSystemPermissionMode.ReadWrite });
+        writePermissionState = await fileHandle.QueryPermissionAsync(new() { Mode = FileSystemPermissionMode.ReadWrite });
     }
 
     private async Task RequestWriteAccess()
     {
         if (fileHandle is null) return;
-        writePermissionState = await fileHandle.RequestPermission(new() { Mode = FileSystemPermissionMode.ReadWrite });
+        writePermissionState = await fileHandle.RequestPermissionAsync(new() { Mode = FileSystemPermissionMode.ReadWrite });
     }
 
     private async Task TextAreaChanged(ChangeEventArgs eventArgs)

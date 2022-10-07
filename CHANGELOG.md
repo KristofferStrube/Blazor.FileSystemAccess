@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added `ArrayBufferAsync` method to `Blob` to read as byte array. By [@fixnil](https://github.com/fixnil).
 - Added public `CreateAsync` methods to `FileSystemHandle`, `FileSystemFileHandle`, and `FileSystemDirectoryHandle`.
+### Fixed
+- Fixed naming of `QueryPermissionAsync` and `RequestPermissionAsync` to have _async_ in name.
+- Fixed that there was an extra _in_ in the name of `OpenFilePickerOptionsStartInFileSystemHandle`.
 
 ## [1.1.0] - 2022-08-19
 ### Added

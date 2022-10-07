@@ -24,7 +24,7 @@ public class OpenFilePickerOptionsStartInWellKnownDirectory : FilePickerOptionsS
 /// <summary>
 /// <see href="https://wicg.github.io/file-system-access/#dictdef-openfilepickeroptions">OpenFilePickerOptions browser specs</see>
 /// </summary>
-public class OpenFilePickerOptionsStartInInFileSystemHandle : FilePickerOptionsStartInFileSystemHandle
+public class OpenFilePickerOptionsStartInFileSystemHandle : FilePickerOptionsStartInFileSystemHandle
 {
     public bool Multiple { get; set; }
 
