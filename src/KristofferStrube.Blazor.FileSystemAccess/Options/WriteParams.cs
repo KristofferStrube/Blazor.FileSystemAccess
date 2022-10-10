@@ -10,7 +10,7 @@ public class BlobWriteParams : BaseWriteParams
     }
 
     [JsonIgnore]
-    public new Blob? Data { get; set; }
+    public Blob? Data { get; set; }
 }
 
 public class StringWriteParams : BaseWriteParams
@@ -21,7 +21,7 @@ public class StringWriteParams : BaseWriteParams
     }
 
     [JsonPropertyName("data")]
-    public new string? Data { get; set; }
+    public string? Data { get; set; }
 }
 
 public class ByteArrayWriteParams : BaseWriteParams
@@ -32,7 +32,7 @@ public class ByteArrayWriteParams : BaseWriteParams
     }
 
     [JsonPropertyName("data")]
-    public new byte[]? Data { get; set; }
+    public byte[]? Data { get; set; }
 }
 
 public abstract class BaseWriteParams
@@ -47,7 +47,4 @@ public abstract class BaseWriteParams
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [JsonPropertyName("position")]
     public ulong Position { get; set; }
-
-    [JsonPropertyName("data")]
-    public object? Data { get; set; }
 }
