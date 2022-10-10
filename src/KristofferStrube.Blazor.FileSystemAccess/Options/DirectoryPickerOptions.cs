@@ -7,7 +7,18 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 /// </summary>
 public class DirectoryPickerOptionsStartInWellKnownDirectory : BaseDirectoryPickerOptions
 {
-    public new WellKnownDirectory? StartIn { get; set; }
+    public WellKnownDirectory? StartIn { get; set; }
+
+    internal override ExpandoObject Serializable()
+    {
+        dynamic res = base.Serializable();
+        if (StartIn != null)
+        {
+            res.startIn = StartIn;
+        }
+
+        return res;
+    }
 }
 
 /// <summary>
@@ -15,25 +26,30 @@ public class DirectoryPickerOptionsStartInWellKnownDirectory : BaseDirectoryPick
 /// </summary>
 public class DirectoryPickerOptionsStartInFileSystemHandle : BaseDirectoryPickerOptions
 {
-    public new FileSystemHandle? StartIn { get; set; }
+    public FileSystemHandle? StartIn { get; set; }
+
+    internal override ExpandoObject Serializable()
+    {
+        dynamic res = base.Serializable();
+        if (StartIn != null)
+        {
+            res.startIn = StartIn;
+        }
+
+        return res;
+    }
 }
 
 public abstract class BaseDirectoryPickerOptions
 {
     public string? Id { get; set; }
-    public object? StartIn { get; set; }
 
-    internal ExpandoObject Serializable()
+    internal virtual ExpandoObject Serializable()
     {
         dynamic res = new ExpandoObject();
         if (Id != null)
         {
             res.id = Id;
-        }
-
-        if (StartIn is not null)
-        {
-            res.startIn = StartIn;
         }
 
         return res;
