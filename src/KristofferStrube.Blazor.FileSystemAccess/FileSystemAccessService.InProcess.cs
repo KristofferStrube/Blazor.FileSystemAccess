@@ -1,16 +1,13 @@
-using KristofferStrube.Blazor.FileSystemAccess.Extensions;
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
-public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessService
+public class FileSystemAccessServiceInProcess : FileSystemAccessService, IFileSystemAccessServiceInProcess
 {
-    protected readonly Lazy<Task<IJSObjectReference>> helperTask;
-    protected readonly IJSRuntime jSRuntime;
+    protected new readonly IJSInProcessRuntime jSRuntime;
 
-    public FileSystemAccessService(IJSRuntime jSRuntime)
+    public FileSystemAccessServiceInProcess(IJSInProcessRuntime jSRuntime) : base(jSRuntime)
     {
-        helperTask = new(() => jSRuntime.GetHelperAsync());
         this.jSRuntime = jSRuntime;
     }
 
@@ -19,7 +16,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     /// </summary>
     /// <param name="openFilePickerOptions"></param>
     /// <returns></returns>
-    public async Task<FileSystemFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions = null)
+    public new async Task<FileSystemFileHandleInProcess[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions = null)
     {
         return await ShowOpenFilePickerPrivateAsync(openFilePickerOptions?.Serializable());
     }
@@ -29,7 +26,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     /// </summary>
     /// <param name="openFilePickerOptions"></param>
     /// <returns></returns>
-    public async Task<FileSystemFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions = null)
+    public new async Task<FileSystemFileHandleInProcess[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions = null)
     {
         return await ShowOpenFilePickerPrivateAsync(openFilePickerOptions?.Serializable());
     }
@@ -38,12 +35,12 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
     /// </summary>
     /// <returns></returns>
-    public async Task<FileSystemFileHandle[]> ShowOpenFilePickerAsync()
+    public new async Task<FileSystemFileHandleInProcess[]> ShowOpenFilePickerAsync()
     {
         return await ShowOpenFilePickerPrivateAsync(null);
     }
 
-    private async Task<FileSystemFileHandle[]> ShowOpenFilePickerPrivateAsync(object? options)
+    private async Task<FileSystemFileHandleInProcess[]> ShowOpenFilePickerPrivateAsync(object? options)
     {
         IJSObjectReference helper = await helperTask.Value;
         IJSObjectReference? jSFileHandles = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showOpenFilePicker", options);
@@ -52,7 +49,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
             Enumerable
                 .Range(0, length)
                 .Select(async i =>
-                    new FileSystemFileHandle(jSRuntime, await jSFileHandles.InvokeAsync<IJSObjectReference>("at", i))
+                    await FileSystemFileHandleInProcess.CreateAsync(jSRuntime, await jSFileHandles.InvokeAsync<IJSInProcessObjectReference>("at", i))
                 )
                 .ToArray()
         );
@@ -63,7 +60,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     /// </summary>
     /// <param name="saveFilePickerOptions"></param>
     /// <returns></returns>
-    public async Task<FileSystemFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInWellKnownDirectory? saveFilePickerOptions = null)
+    public new async Task<FileSystemFileHandleInProcess> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInWellKnownDirectory? saveFilePickerOptions = null)
     {
         return await ShowSaveFilePickerPrivateAsync(saveFilePickerOptions?.Serializable());
     }
@@ -73,7 +70,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     /// </summary>
     /// <param name="saveFilePickerOptions"></param>
     /// <returns></returns>
-    public async Task<FileSystemFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInFileSystemHandle? saveFilePickerOptions = null)
+    public new async Task<FileSystemFileHandleInProcess> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInFileSystemHandle? saveFilePickerOptions = null)
     {
         return await ShowSaveFilePickerPrivateAsync(saveFilePickerOptions?.Serializable());
     }
@@ -82,15 +79,15 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     /// <see href="https://wicg.github.io/file-system-access/#api-showsavefilepicker">showSaveFilePicker() browser specs</see>
     /// </summary>
     /// <returns></returns>
-    public async Task<FileSystemFileHandle> ShowSaveFilePickerAsync()
+    public new async Task<FileSystemFileHandleInProcess> ShowSaveFilePickerAsync()
     {
         return await ShowSaveFilePickerPrivateAsync(null);
     }
 
-    private async Task<FileSystemFileHandle> ShowSaveFilePickerPrivateAsync(object? options)
+    private async Task<FileSystemFileHandleInProcess> ShowSaveFilePickerPrivateAsync(object? options)
     {
-        IJSObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showSaveFilePicker", options);
-        return new FileSystemFileHandle(jSRuntime, jSFileHandle);
+        IJSInProcessObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("window.showSaveFilePicker", options);
+        return await FileSystemFileHandleInProcess.CreateAsync(jSRuntime, jSFileHandle);
     }
 
     /// <summary>
@@ -98,17 +95,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     /// </summary>
     /// <param name="directoryPickerOptions"></param>
     /// <returns></returns>
-    public async Task<FileSystemDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInWellKnownDirectory? directoryPickerOptions = null)
-    {
-        return await ShowDirectoryPickerPrivateAsync(directoryPickerOptions?.Serializable());
-    }
-
-    /// <summary>
-    /// <see href="https://wicg.github.io/file-system-access/#api-showdirectorypicker">showDirectoryPicker() browser specs</see>
-    /// </summary>
-    /// <param name="directoryPickerOptions"></param>
-    /// <returns></returns>
-    public async Task<FileSystemDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInFileSystemHandle? directoryPickerOptions = null)
+    public new async Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInWellKnownDirectory? directoryPickerOptions = null)
     {
         return await ShowDirectoryPickerPrivateAsync(directoryPickerOptions?.Serializable());
     }
@@ -118,46 +105,34 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     /// </summary>
     /// <param name="directoryPickerOptions"></param>
     /// <returns></returns>
-    public async Task<FileSystemDirectoryHandle> ShowDirectoryPickerAsync()
+    public new async Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInFileSystemHandle? directoryPickerOptions = null)
+    {
+        return await ShowDirectoryPickerPrivateAsync(directoryPickerOptions?.Serializable());
+    }
+
+    /// <summary>
+    /// <see href="https://wicg.github.io/file-system-access/#api-showdirectorypicker">showDirectoryPicker() browser specs</see>
+    /// </summary>
+    /// <param name="directoryPickerOptions"></param>
+    /// <returns></returns>
+    public new async Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerAsync()
     {
         return await ShowDirectoryPickerPrivateAsync(null);
     }
 
-    private async Task<FileSystemDirectoryHandle> ShowDirectoryPickerPrivateAsync(object? options)
+    private async Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerPrivateAsync(object? options)
     {
-        IJSObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showDirectoryPicker", options);
-        return new FileSystemDirectoryHandle(jSRuntime, jSFileHandle);
+        IJSInProcessObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("window.showDirectoryPicker", options);
+        return await FileSystemDirectoryHandleInProcess.CreateAsync(jSRuntime, jSFileHandle);
     }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#dom-storagemanager-getdirectory">getDirectory() for StorageManager browser specs</see>
     /// </summary>
     /// <returns></returns>
-    public async Task<FileSystemDirectoryHandle> GetOriginPrivateDirectoryAsync()
+    public new async Task<FileSystemDirectoryHandleInProcess> GetOriginPrivateDirectoryAsync()
     {
-        IJSObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("navigator.storage.getDirectory");
-        return new FileSystemDirectoryHandle(jSRuntime, jSFileHandle);
-    }
-
-    /// <summary>
-    /// Meta method for the wrapper that checks if the API is available in the current browser.
-    /// </summary>
-    /// <returns></returns>
-    public async Task<bool> IsSupportedAsync()
-    {
-        return
-            await jSRuntime.InvokeAsync<bool>("window.hasOwnProperty", "showOpenFilePicker") &
-            await jSRuntime.InvokeAsync<bool>("window.hasOwnProperty", "showSaveFilePicker") &
-            await jSRuntime.InvokeAsync<bool>("window.hasOwnProperty", "showDirectoryPicker");
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (helperTask.IsValueCreated)
-        {
-            IJSObjectReference module = await helperTask.Value;
-            await module.DisposeAsync();
-        }
-        GC.SuppressFinalize(this);
+        IJSInProcessObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("navigator.storage.getDirectory");
+        return await FileSystemDirectoryHandleInProcess.CreateAsync(jSRuntime, jSFileHandle);
     }
 }

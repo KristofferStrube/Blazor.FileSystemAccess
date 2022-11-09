@@ -33,7 +33,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.6" />
+    <PackageReference Include="KristofferStrube.Blazor.Streams" Version="0.2.2" />
+    <PackageReference Include="KristofferStrube.Blazor.FileAPI" Version="0.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.*" />
   </ItemGroup>
 
 </Project>
