@@ -82,7 +82,7 @@ else
             if (value.Kind is FileSystemHandleKind.File)
             {
                 var fileSystemHandle = await dir.GetFileHandleAsync(value.Name);
-                var file = await fileSystemHandle.GetFileInProcessAsync();
+                var file = await fileSystemHandle.GetFileAsync();
                 entity.Size = file.Size;
             }
             else

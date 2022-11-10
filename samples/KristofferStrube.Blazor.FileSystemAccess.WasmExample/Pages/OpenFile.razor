@@ -65,7 +65,7 @@ else
         Console.WriteLine($"Name: {fileHandle.Name}");
         Console.WriteLine($"Kind: {fileHandle.Kind}");
         Console.WriteLine($"Is Same as Self: {await fileHandle.IsSameEntryAsync(fileHandle)}");
-        var file = await fileHandle.GetFileInProcessAsync();
+        var file = await fileHandle.GetFileAsync();
         Console.WriteLine($"File Name: {file.Name}");
         Console.WriteLine($"File LastModified: {file.LastModified.ToString()}");
         Console.WriteLine($"File Size: {file.Size}");
