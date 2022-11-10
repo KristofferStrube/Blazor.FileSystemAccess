@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2022-11-10
+### Added
+- Added interfaces for `FileSystemAccessService` and `FileSystemAccessServiceInProcess` so that they are test friendly.
+- Added the following InProcess variants of wrapper classes: `FileSystemDirectoryHandle`, `FileSystemFileHandle`, `FileSystemHandle` and `FileSystemWritableFileStream`.
+
+### Changed
+- Changed the Blazor WebAssembly compatible service to be named `FileSystemAccessServiceInProcess` instead of `FileSystemAccessService` so that Blazor Server support is the standard.
+- Changed to use the Blazor.FileAPI's definition of `Blob`s and `File`s.
+- Changed to have `FileSystemWritableFileStream` extend Blazor.Streams's `WritableStream` instead of .NET `Stream`.
+- Changed creator methods `CreateAsync` to take `IJSRuntime` first to normalize standards with other wrappers.
+
 ## [1.2.1] - 2022-10-10
 ### Fixed
 - Fixed that `BlobWriteParams`, `StringWriteParams`, and `ByteArrayWriteParams` didn't set their `WriteCommandType` given from the constructor.
