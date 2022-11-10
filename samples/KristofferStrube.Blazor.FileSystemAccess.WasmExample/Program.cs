@@ -9,7 +9,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-builder.Services.AddFileSystemAccessService();
+builder.Services.AddFileSystemAccessServiceInProcess();
 
 // Adding and configuring IndexedDB used for the IndexedDB sample.
 builder.Services.AddIndexedDB(dbStore =>

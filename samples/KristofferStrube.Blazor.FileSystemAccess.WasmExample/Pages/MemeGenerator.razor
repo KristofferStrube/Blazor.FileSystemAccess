@@ -1,5 +1,5 @@
 ﻿@page "/MemeGenerator"
-@inject FileSystemAccessService FileSystemAccessService
+@inject IFileSystemAccessServiceInProcess FileSystemAccessService
 @inject IJSRuntime jSRuntime
 @using System.Text.Json.Serialization
 
@@ -30,7 +30,7 @@
 <canvas @ref=canvasReference width=@canvasSize height=@canvasSize></canvas>
 
 @code {
-    private FileSystemFileHandle? fileHandle;
+    private FileSystemFileHandleInProcess? fileHandle;
     private File? file;
 
     private ElementReference canvasReference { get; set; }
@@ -147,7 +147,7 @@
 
     public async Task Save()
     {
-        FileSystemFileHandle? saveFileHandle = null;
+        FileSystemFileHandleInProcess? saveFileHandle = null;
         try
         {
             var suggestedName = fileHandle is null ? "meme" : "meme_" + fileHandle.Name;
@@ -198,7 +198,7 @@
         public async Task InvokeCallback()
         {
             var jSBlob = await jSRuntime.InvokeAsync<IJSObjectReference>("getAttribute", blobWrapper, "blob");
-            var blob = await Blob.CreateAsync(jSBlob, jSRuntime);
+            var blob = Blob.Create(jSRuntime, jSBlob);
             Callback?.Invoke(blob);
         }
 

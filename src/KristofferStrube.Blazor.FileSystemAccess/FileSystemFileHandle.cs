@@ -1,4 +1,4 @@
-﻿using KristofferStrube.Blazor.FileSystemAccess.Extensions;
+﻿using KristofferStrube.Blazor.FileAPI;
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
@@ -8,23 +8,28 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 /// </summary>
 public class FileSystemFileHandle : FileSystemHandle
 {
-    public static new async Task<FileSystemFileHandle> CreateAsync(IJSObjectReference jSReference, IJSRuntime jSRuntime)
+    public static new FileSystemFileHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
-        IJSInProcessObjectReference helper = await jSRuntime.GetHelperAsync();
-        return new FileSystemFileHandle(jSReference, helper);
+        return new FileSystemFileHandle(jSRuntime, jSReference);
     }
 
-    internal FileSystemFileHandle(IJSObjectReference jSReference, IJSInProcessObjectReference helper) : base(jSReference, helper) { }
+    internal FileSystemFileHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference) : base(jSRuntime, jSReference) { }
 
-    public async Task<File> GetFileAsync()
+    public async Task<FileAPI.File> GetFileAsync()
     {
         IJSObjectReference? jSFile = await JSReference.InvokeAsync<IJSObjectReference>("getFile");
-        return new File(jSFile, helper);
+        return FileAPI.File.Create(jSRuntime, jSFile);
+    }
+
+    public async Task<FileInProcess> GetFileInProcessAsync()
+    {
+        IJSInProcessObjectReference? jSFile = await JSReference.InvokeAsync<IJSInProcessObjectReference>("getFile");
+        return await FileInProcess.CreateAsync(jSRuntime, jSFile);
     }
 
     public async Task<FileSystemWritableFileStream> CreateWritableAsync(FileSystemCreateWritableOptions? fileSystemCreateWritableOptions = null)
     {
         IJSObjectReference? jSFileSystemWritableFileStream = await JSReference.InvokeAsync<IJSObjectReference>("createWritable", fileSystemCreateWritableOptions);
-        return new FileSystemWritableFileStream(jSFileSystemWritableFileStream, helper);
+        return new FileSystemWritableFileStream(jSRuntime, jSFileSystemWritableFileStream);
     }
 }

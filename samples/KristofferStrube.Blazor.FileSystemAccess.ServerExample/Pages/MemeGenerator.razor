@@ -1,0 +1,210 @@
+﻿@page "/MemeGenerator"
+@inject IFileSystemAccessService FileSystemAccessService
+@inject IJSRuntime jSRuntime
+@using System.Text.Json.Serialization
+
+<PageTitle>File System Access - Meme Generator</PageTitle>
+
+<button @onclick="OpenFilePicker" class="btn btn-primary">Open Image</button>
+@if (fileHandle != null)
+{
+    <div class="row">
+        <div class="form-group col">
+            <label for="canvasSize">Canvas Size:</label>
+            <input id="canvasSize" type="number" @oninput="WriteCanvasSize" class="form-control" value=@canvasSize />
+        </div>
+        <div class="form-group col">
+            <label for="topText">Top Text:</label>
+            <input id="topText" @oninput="WriteTopText" class="form-control" />
+        </div>
+        <div class="form-group col">
+            <label for="bottomText">Bottom Text:</label>
+            <input id="bottomText" @oninput="WriteBottomText" class="form-control" />
+        </div>
+    </div>
+    <br />
+    <button class="btn btn-primary" @onclick=Save>Save</button>
+    <br />
+}
+<br />
+<canvas @ref=canvasReference width=@canvasSize height=@canvasSize></canvas>
+
+@code {
+    private FileSystemFileHandle? fileHandle;
+    private File? file;
+
+    private ElementReference canvasReference { get; set; }
+
+    private string topText = "";
+    private string bottomText = "";
+
+    private IJSObjectReference? jSCanvas;
+    private IJSObjectReference? jS2dContext;
+    private IJSObjectReference? jSImageBitmap;
+
+    private double canvasSize = 600;
+    private double imageDrawHeight;
+    private double imageDrawWidth;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Get Canvas
+        jSCanvas = await jSRuntime.InvokeAsync<IJSObjectReference>("jSReference", canvasReference);
+        jS2dContext = await jSCanvas.InvokeAsync<IJSObjectReference>("getContext", "2d");
+    }
+
+    protected async Task OpenFilePicker()
+    {
+        try
+        {
+            var options = new OpenFilePickerOptionsStartInWellKnownDirectory()
+                {
+                    Types = new FilePickerAcceptType[] {
+                        new FilePickerAcceptType() {
+                            Description = "Images",
+                            Accept = new() { { "image/*", new string[] { ".png", ".gif", ".jpeg", ".jpg" } } }
+                        }
+                    },
+                    Multiple = false,
+                    StartIn = WellKnownDirectory.Pictures
+                };
+            var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
+            fileHandle = fileHandles.Single();
+        }
+        catch (JSException ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            if (fileHandle != null)
+            {
+                file = await fileHandle.GetFileAsync();
+                var jSBlob = file.JSReference;
+                // Get Image
+                jSImageBitmap = await jSRuntime.InvokeAsync<IJSObjectReference>("createImageBitmap", jSBlob);
+                // Draw Image
+                await DrawImage();
+            }
+        }
+    }
+
+    public async Task DrawImage()
+    {
+        if (jS2dContext == null) return;
+        double imageWidth = await jSRuntime.InvokeAsync<double>("getAttribute", jSImageBitmap, "width");
+        double imageHeight = await jSRuntime.InvokeAsync<double>("getAttribute", jSImageBitmap, "height");
+        imageDrawWidth = (imageWidth > imageHeight ? 1 : imageWidth / imageHeight) * canvasSize;
+        imageDrawHeight = (imageWidth < imageHeight ? 1 : imageHeight / imageWidth) * canvasSize;
+        await jSRuntime.InvokeVoidAsync("setAttribute", jSCanvas, "width", imageDrawWidth);
+        await jSRuntime.InvokeVoidAsync("setAttribute", jSCanvas, "height", imageDrawHeight);
+        await jS2dContext.InvokeVoidAsync("drawImage", jSImageBitmap, 0, 0, imageDrawWidth, imageDrawHeight);
+    }
+
+    public async Task WriteText()
+    {
+        if (jS2dContext == null) return;
+        await DrawImage();
+        // Set Draw style
+        await jSRuntime.InvokeVoidAsync("setAttribute", jS2dContext, "font", "bold 48px impact");
+        await jSRuntime.InvokeVoidAsync("setAttribute", jS2dContext, "textAlign", "center");
+        await jSRuntime.InvokeVoidAsync("setAttribute", jS2dContext, "fillStyle", "white");
+        await jSRuntime.InvokeVoidAsync("setAttribute", jS2dContext, "strokeStyle", "black");
+        await jSRuntime.InvokeVoidAsync("setAttribute", jS2dContext, "lineWidth", "1");
+        // Top Text
+        await jS2dContext.InvokeVoidAsync("fillText", topText, imageDrawWidth / 2, 60, imageDrawWidth - 24);
+        await jS2dContext.InvokeVoidAsync("strokeText", topText, imageDrawWidth / 2, 60, imageDrawWidth - 24);
+        // Bottom Text
+        await jS2dContext.InvokeVoidAsync("fillText", bottomText, imageDrawWidth / 2, imageDrawHeight - 12, imageDrawWidth - 24);
+        await jS2dContext.InvokeVoidAsync("strokeText", bottomText, imageDrawWidth / 2, imageDrawHeight - 12, imageDrawWidth - 24);
+    }
+
+    protected async Task WriteCanvasSize(ChangeEventArgs eventArgs)
+    {
+        if (eventArgs.Value is string size && double.TryParse(size, out canvasSize))
+        {
+            await WriteText();
+        }
+    }
+
+    protected async Task WriteTopText(ChangeEventArgs eventArgs)
+    {
+        if (eventArgs.Value is string topText)
+        {
+            this.topText = topText;
+            await WriteText();
+        }
+    }
+
+    protected async Task WriteBottomText(ChangeEventArgs eventArgs)
+    {
+        if (eventArgs.Value is string bottomText)
+        {
+            this.bottomText = bottomText;
+            await WriteText();
+        }
+    }
+
+    public async Task Save()
+    {
+        FileSystemFileHandle? saveFileHandle = null;
+        try
+        {
+            var suggestedName = fileHandle is null ? "meme" : "meme_" + await fileHandle.GetNameAsync();
+            var options = new SaveFilePickerOptionsStartInWellKnownDirectory()
+                {
+                    StartIn = WellKnownDirectory.Pictures,
+                    SuggestedName = suggestedName
+                };
+            saveFileHandle = await FileSystemAccessService.ShowSaveFilePickerAsync(options);
+        }
+        catch (JSException ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            if (saveFileHandle != null && jSCanvas != null)
+            {
+                var blobCallback = new BlobCallback(jSRuntime);
+                blobCallback.Callback = async (Blob blob) =>
+                {
+                    var writable = await saveFileHandle.CreateWritableAsync();
+                    await writable.WriteAsync(blob);
+                    await writable.CloseAsync();
+                };
+                await blobCallback.ToBlobAsync(jSCanvas);
+            }
+        }
+    }
+
+    public class BlobCallback
+    {
+        private IJSObjectReference? blobWrapper;
+        private IJSRuntime jSRuntime;
+
+        public BlobCallback(IJSRuntime jSRuntime)
+        {
+            this.jSRuntime = jSRuntime;
+            objRef = DotNetObjectReference.Create(this);
+        }
+
+        public DotNetObjectReference<BlobCallback> objRef { get; init; }
+
+        [JsonIgnore]
+        public Action<Blob>? Callback { get; set; }
+
+        [JSInvokable("Callback")]
+        public async Task InvokeCallback()
+        {
+            var jSBlob = await jSRuntime.InvokeAsync<IJSObjectReference>("getAttribute", blobWrapper, "blob");
+            var blob = Blob.Create(jSRuntime, jSBlob);
+            Callback?.Invoke(blob);
+        }
+
+        public async Task ToBlobAsync(IJSObjectReference jSCanvas)
+        {
+            blobWrapper = await jSRuntime.InvokeAsync<IJSObjectReference>("toBlob", jSCanvas, this);
+        }
+    }
+}

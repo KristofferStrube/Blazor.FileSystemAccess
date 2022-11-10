@@ -1,0 +1,168 @@
+﻿@page "/TreeMapChart"
+@inject IFileSystemAccessService FileSystemAccessService
+
+<PageTitle>File System Access - Tree Map Chart</PageTitle>
+
+@if (rootEntity.Children.Count == 0)
+{
+    <button @onclick="OpenDictoryPicker" class="btn btn-primary">Open Directory</button>
+}
+else
+{
+    @($"{entitiesChecked} entities checked for size")
+    <br />
+    @if (hoverItem != null)
+    {
+        <b>@hoverItemPath: </b> @ReadableByteSize(Size(hoverItem))
+    }
+    <br />
+    <div style="height:calc(100vh - 200px);">
+        <TreemapChart Items=rootEntity.Children
+                  QuantityMapper="item => Size(item)"
+                  LabelMapper=@(item => "")
+                  FillMapper="item => Rainbow(rootEntity.Children.OrderBy(e => e.Size).ToList().IndexOf(rootEntity.Children.First(e => e.ColorIndex == item.ColorIndex)), rootEntity.Children.Count)"
+                  OnMouseOver="SelectHoverItem"
+                  OnMouseOut="item =>  {hoverItem = null; StateHasChanged();}"
+                  Children="item => item.Children"
+                  IsLeaf="item => item.Kind is FileSystemHandleKind.File"
+                  Padding="1" />
+    </div>
+}
+
+@code {
+    private Entity? hoverItem;
+
+    private Entity rootEntity = new(FileSystemHandleKind.Directory, null, 0);
+
+    private FileSystemDirectoryHandle? directoryHandle = null;
+
+    private int entitiesChecked;
+
+    private string hoverItemPath = "";
+
+    protected async Task OpenDictoryPicker()
+    {
+        try
+        {
+            var options = new DirectoryPickerOptionsStartInWellKnownDirectory() { StartIn = WellKnownDirectory.Pictures };
+            directoryHandle = await FileSystemAccessService.ShowDirectoryPickerAsync(options);
+        }
+        catch (JSException ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            if (directoryHandle != null)
+            {
+                await BreadthFirstTraversal(directoryHandle);
+            }
+        }
+    }
+
+    // Breadth First Traversal of the directories.
+    private async Task BreadthFirstTraversal(FileSystemDirectoryHandle directoryHandle)
+    {
+        var values = await directoryHandle.ValuesAsync();
+        entitiesChecked = 0;
+        StateHasChanged();
+        var queue = new Queue<(Entity entity, FileSystemDirectoryHandle dir, FileSystemHandle value)>();
+        for (int i = 0; i < values.Count(); i++)
+        {
+            var value = values[i];
+            var entity = new Entity(await value.GetKindAsync(), value, i);
+            rootEntity.Children.Add(entity);
+            queue.Enqueue((entity, directoryHandle, value));
+            StateHasChanged();
+        }
+        while (queue.Count > 0)
+        {
+            var (entity, dir, value) = queue.Dequeue();
+            entitiesChecked += 1;
+            if (await value.GetKindAsync() is FileSystemHandleKind.File)
+            {
+                var fileSystemHandle = await dir.GetFileHandleAsync(await value.GetNameAsync());
+                var file = await fileSystemHandle.GetFileAsync();
+                entity.Size = await file.GetSizeAsync();
+            }
+            else
+            {
+                var fileSystemDirectoryHandle = await dir.GetDirectoryHandleAsync(await value.GetNameAsync());
+                var innerValues = await fileSystemDirectoryHandle.ValuesAsync();
+                foreach (var innerValue in innerValues)
+                {
+                    var innerEntity = new Entity(await innerValue.GetKindAsync(), innerValue, entity.ColorIndex);
+                    entity.Children.Add(innerEntity);
+                    queue.Enqueue((innerEntity, fileSystemDirectoryHandle, innerValue));
+                }
+            }
+            StateHasChanged();
+        }
+    }
+
+    protected class Entity
+    {
+        public Entity(FileSystemHandleKind Kind, FileSystemHandle? Handle, int ColorIndex)
+        {
+            this.Kind = Kind;
+            this.Handle = Handle;
+            this.ColorIndex = ColorIndex;
+            Children = new();
+        }
+        public FileSystemHandleKind Kind { get; set; }
+        public FileSystemHandle? Handle { get; set; }
+        public ulong Size { get; set; }
+        public List<Entity> Children { get; set; }
+        public int ColorIndex { get; set; }
+    }
+
+    protected ulong Size(Entity entity) => entity switch
+    {
+        { Children: { Count: 0 } } => entity.Size,
+        _ => (ulong)entity.Children.Sum(e => (long)Size(e))
+    };
+
+    // From https://stackoverflow.com/questions/281640/how-do-i-get-a-human-readable-file-size-in-bytes-abbreviation-using-net
+    private string ReadableByteSize(ulong size)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        int order = 0;
+        while (size >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            size = size / 1024;
+        }
+
+        // Adjust the format string to your preferences. For example "{0:0.#}{1}" would
+        // show a single decimal place, and no space.
+        return String.Format("{0:0.##} {1}", size, sizes[order]);
+    }
+
+    // Inspired by https://stackoverflow.com/questions/2288498/how-do-i-get-a-rainbow-color-gradient-in-c
+    protected string Rainbow(double index, double total)
+    {
+        double part = index / total * 6;
+        int ascending = (int)((part % 1) * 255);
+        int descending = 255 - ascending;
+
+        return ((int)part) switch
+        {
+            0 => $"rgba(255, {ascending}, 0, 1)",
+            1 => $"rgba({descending}, 255, 0, 1)",
+            2 => $"rgba(0, 255, {ascending}, 1)",
+            3 => $"rgba(0, {descending}, 255, 1)",
+            4 => $"rgba({ascending}, 0, 255, 1)",
+            _ => $"rgba(255, 0, {descending}, 1)"
+        };
+    }
+
+    protected async void SelectHoverItem(Entity item)
+    {
+        hoverItem = item;
+        if (directoryHandle is not null && item.Handle is FileSystemHandle)
+        {
+            hoverItemPath = string.Join("/", await directoryHandle.ResolveAsync(item.Handle) ?? new string[] { "" });
+        }
+        StateHasChanged();
+    }
+}

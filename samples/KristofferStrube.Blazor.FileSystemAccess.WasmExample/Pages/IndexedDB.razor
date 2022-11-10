@@ -1,6 +1,6 @@
 ﻿@page "/IndexedDB"
 @using System.Text.Json.Serialization
-@inject FileSystemAccessService FileSystemAccessService
+@inject IFileSystemAccessServiceInProcess FileSystemAccessService
 @inject IndexedDBManager DbManager
 @inject IJSRuntime JSRuntime
 
@@ -27,8 +27,8 @@ In this sample we store the references to files that we have previously opened i
 
 @code {
     protected string FileText = "";
-    protected FileSystemFileHandle? FileHandle;
-    protected List<(bool active, FileSystemFileHandle fileHandle)> StoredFileHandles = new();
+    protected FileSystemFileHandleInProcess? FileHandle;
+    protected List<(bool active, FileSystemFileHandleInProcess fileHandle)> StoredFileHandles = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,7 +40,7 @@ In this sample we store the references to files that we have previously opened i
         var length = await JSRuntime.InvokeAsync<int>("getAttribute", entries, "length");
         StoredFileHandles = (await Task.WhenAll(Enumerable
             .Range(0, length)
-            .Select(async i => (false, await FileSystemFileHandle.CreateAsync(await entries.InvokeAsync<IJSObjectReference>("at", i), JSRuntime)))
+            .Select(async i => (false, await FileSystemFileHandleInProcess.CreateAsync(JSRuntime, await entries.InvokeAsync<IJSInProcessObjectReference>("at", i))))
             )).ToList();
     }
 
@@ -90,7 +90,7 @@ In this sample we store the references to files that we have previously opened i
         }
     }
 
-    protected async Task SelectFile(FileSystemFileHandle fileHandle)
+    protected async Task SelectFile(FileSystemFileHandleInProcess fileHandle)
     {
         var state = await fileHandle.RequestPermissionAsync(new() { Mode = FileSystemPermissionMode.ReadWrite });
         if (state is PermissionState.Granted)

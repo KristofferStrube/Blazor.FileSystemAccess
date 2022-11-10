@@ -1,5 +1,5 @@
 ﻿@page "/TreeMapChart"
-@inject FileSystemAccessService FileSystemAccessService
+@inject IFileSystemAccessServiceInProcess FileSystemAccessService
 
 <PageTitle>File System Access - Tree Map Chart</PageTitle>
 
@@ -34,7 +34,7 @@ else
 
     private Entity rootEntity = new(FileSystemHandleKind.Directory, null, 0);
 
-    private FileSystemDirectoryHandle? directoryHandle = null;
+    private FileSystemDirectoryHandleInProcess? directoryHandle = null;
 
     private int entitiesChecked;
 
@@ -61,12 +61,12 @@ else
     }
 
     // Breadth First Traversal of the directories.
-    private async Task BreadthFirstTraversal(FileSystemDirectoryHandle directoryHandle)
+    private async Task BreadthFirstTraversal(FileSystemDirectoryHandleInProcess directoryHandle)
     {
         var values = await directoryHandle.ValuesAsync();
         entitiesChecked = 0;
         StateHasChanged();
-        var queue = new Queue<(Entity entity, FileSystemDirectoryHandle dir, FileSystemHandle value)>();
+        var queue = new Queue<(Entity entity, FileSystemDirectoryHandleInProcess dir, FileSystemHandleInProcess value)>();
         for (int i = 0; i < values.Count(); i++)
         {
             var value = values[i];
@@ -82,7 +82,7 @@ else
             if (value.Kind is FileSystemHandleKind.File)
             {
                 var fileSystemHandle = await dir.GetFileHandleAsync(value.Name);
-                var file = await fileSystemHandle.GetFileAsync();
+                var file = await fileSystemHandle.GetFileInProcessAsync();
                 entity.Size = file.Size;
             }
             else

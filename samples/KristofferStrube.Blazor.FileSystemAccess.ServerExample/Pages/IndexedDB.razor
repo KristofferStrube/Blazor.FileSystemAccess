@@ -1,0 +1,122 @@
+﻿@page "/IndexedDB"
+@using System.Text.Json.Serialization
+@inject IFileSystemAccessService FileSystemAccessService
+@inject IndexedDBManager DbManager
+@inject IJSRuntime JSRuntime
+
+<PageTitle>File System Access - IndexedDB</PageTitle>
+
+In this sample we store the references to files that we have previously opened in a list and persists this list in <code>IndexedDB</code> so that we can see our previously visited files with ease even after page reloads.
+<br />
+<br />
+
+<button @onclick="OpenFilePicker" class="btn btn-primary">
+    @(StoredFileHandles.Count > 0 ? "Open Another File" : "Open File")
+</button>
+<br />
+<br />
+@foreach (var (active, fileHandle, fileHandleName) in StoredFileHandles)
+{
+    var color = active ? "btn-primary" : "btn-secondary";
+    <button class="btn @color btn-sm me-1" @onclick="() => SelectFile(fileHandle)">@fileHandleName</button>
+}
+@if (FileHandle is not null)
+{
+    <textarea style="width:100%;height:calc(100% - 160px);" value=@FileText @oninput=TextAreaChanged></textarea>
+}
+
+@code {
+    protected string FileText = "";
+    protected FileSystemFileHandle? FileHandle;
+    protected List<(bool active, FileSystemFileHandle fileHandle, string fileHandleName)> StoredFileHandles = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        // Opening DB and getting the records as an IJSObjectReference.
+        await DbManager.OpenDb();
+        var entries = await JSRuntime.InvokeAsync<IJSObjectReference>("TimeGhost.IndexedDbManager.getRecords", "FileReferences");
+
+        // Loop through elements in list and create FileSystemFileHandle instances from them.
+        var length = await JSRuntime.InvokeAsync<int>("getAttribute", entries, "length");
+        StoredFileHandles = (await Task.WhenAll(Enumerable
+            .Range(0, length)
+            .Select(async i => {
+                var fileHandle = FileSystemFileHandle.Create(JSRuntime, await entries.InvokeAsync<IJSObjectReference>("at", i));
+                return (false, fileHandle, await fileHandle.GetNameAsync());
+            })
+            )).ToList();
+        StateHasChanged();
+    }
+
+    protected async Task OpenFilePicker()
+    {
+        try
+        {
+            var options = new OpenFilePickerOptionsStartInWellKnownDirectory()
+                {
+                    Multiple = false
+                };
+            var handles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
+            FileHandle = handles.Single();
+        }
+        catch (JSException ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            if (FileHandle != null)
+            {
+                if ((await Task.WhenAll(StoredFileHandles.Select(async tuple => await tuple.fileHandle.IsSameEntryAsync(FileHandle)))).All(b => !b))
+                {
+                    StoredFileHandles.Add((false, FileHandle, await FileHandle.GetNameAsync()));
+                    var newRecord = new StoreRecord<IJSObjectReference>()
+                        {
+                            Storename = "FileReferences",
+                            Data = FileHandle.JSReference
+                        };
+                    await DbManager.AddRecord(newRecord);
+                }
+                await UpdateActiveStoredFileHandle(FileHandle);
+                var file = await FileHandle.GetFileAsync();
+                FileText = await file.TextAsync();
+            }
+        }
+    }
+
+    protected async Task TextAreaChanged(ChangeEventArgs eventArgs)
+    {
+        if (FileHandle is not null && eventArgs.Value is string value)
+        {
+            var writable = await FileHandle.CreateWritableAsync();
+            await writable.WriteAsync(value);
+            await writable.CloseAsync();
+        }
+    }
+
+    protected async Task SelectFile(FileSystemFileHandle fileHandle)
+    {
+        var state = await fileHandle.RequestPermissionAsync(new() { Mode = FileSystemPermissionMode.ReadWrite });
+        if (state is PermissionState.Granted)
+        {
+            await UpdateActiveStoredFileHandle(fileHandle);
+            FileHandle = fileHandle;
+            var file = await FileHandle.GetFileAsync();
+            var fileSize = await file.GetSizeAsync();
+            FileText = "";
+            for (int i = 0; i < (int)fileSize; i += 1024)
+            {
+                var slice = await file.SliceAsync(i, i + 1024);
+                FileText += await slice.TextAsync();
+            }
+        }
+    }
+
+    protected async Task UpdateActiveStoredFileHandle(FileSystemFileHandle fileHandle)
+    {
+        StoredFileHandles = (await Task.WhenAll(StoredFileHandles
+                .Select(async tuple => (active: await tuple.fileHandle.IsSameEntryAsync(fileHandle), fileHandle: tuple.fileHandle, fileHandleName: tuple.fileHandleName))
+            )).ToList();
+    }
+}

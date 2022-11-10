@@ -1,5 +1,5 @@
 ﻿@page "/InputFileExample"
-@inject FileSystemAccessService FileSystemAccessService
+@inject IFileSystemAccessServiceInProcess FileSystemAccessService
 
 <PageTitle>File System Access - InputFile Example</PageTitle>
 
@@ -30,9 +30,9 @@ else
         if (SaveFileHandle is not null)
         {
             readFile = args.File;
-            
+
             using var stream = readFile.OpenReadStream(maxAllowedSize: 10000000000);
-            using var writable = await SaveFileHandle.CreateWritableAsync(new() { KeepExistingData = false });
+            await using var writable = await SaveFileHandle.CreateWritableAsync(new() { KeepExistingData = false });
             await stream.CopyToAsync(writable);
             SaveFileHandle = null;
             readFile = null;

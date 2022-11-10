@@ -1,31 +1,30 @@
-﻿using KristofferStrube.Blazor.FileSystemAccess.Extensions;
-using Microsoft.JSInterop;
+﻿using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
 /// <summary>
 /// <see href="https://wicg.github.io/file-system-access/#api-filesystemhandle">FileSystemHandle browser specs</see>
 /// </summary>
-public class FileSystemHandle
+public class FileSystemHandle : BaseJSWrapper
 {
-    public readonly IJSObjectReference JSReference;
-    protected readonly IJSInProcessObjectReference helper;
-
-    public static async Task<FileSystemFileHandle> CreateAsync(IJSObjectReference jSReference, IJSRuntime jSRuntime)
+    public static FileSystemHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
-        IJSInProcessObjectReference helper = await jSRuntime.GetHelperAsync();
-        return new FileSystemFileHandle(jSReference, helper);
+        return new FileSystemHandle(jSRuntime, jSReference);
     }
 
-    internal FileSystemHandle(IJSObjectReference jSReference, IJSInProcessObjectReference helper)
+    internal FileSystemHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference) : base(jSRuntime, jSReference) { }
+
+    public async Task<FileSystemHandleKind> GetKindAsync()
     {
-        this.JSReference = jSReference;
-        this.helper = helper;
+        IJSObjectReference helper = await helperTask.Value;
+        return await helper.InvokeAsync<FileSystemHandleKind>("getAttribute", JSReference, "kind");
     }
 
-    public string Name => helper.Invoke<string>("getAttribute", JSReference, "name");
-
-    public FileSystemHandleKind Kind => helper.Invoke<FileSystemHandleKind>("getAttribute", JSReference, "kind");
+    public async Task<string> GetNameAsync()
+    {
+        IJSObjectReference helper = await helperTask.Value;
+        return await helper.InvokeAsync<string>("getAttribute", JSReference, "name");
+    }
 
     public async Task<bool> IsSameEntryAsync(FileSystemHandle other)
     {

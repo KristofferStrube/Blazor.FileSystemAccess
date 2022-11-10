@@ -1,5 +1,5 @@
 ﻿@page "/OpenFile"
-@inject FileSystemAccessService FileSystemAccessService
+@inject IFileSystemAccessServiceInProcess FileSystemAccessService
 
 <PageTitle>File System Access - Read File</PageTitle>
 
@@ -28,7 +28,7 @@ else
 
 @code {
     private string? fileText;
-    private FileSystemFileHandle? fileHandle;
+    private FileSystemFileHandleInProcess? fileHandle;
     private PermissionState readPermissionState;
     private PermissionState writePermissionState;
 
@@ -65,7 +65,7 @@ else
         Console.WriteLine($"Name: {fileHandle.Name}");
         Console.WriteLine($"Kind: {fileHandle.Kind}");
         Console.WriteLine($"Is Same as Self: {await fileHandle.IsSameEntryAsync(fileHandle)}");
-        var file = await fileHandle.GetFileAsync();
+        var file = await fileHandle.GetFileInProcessAsync();
         Console.WriteLine($"File Name: {file.Name}");
         Console.WriteLine($"File LastModified: {file.LastModified.ToString()}");
         Console.WriteLine($"File Size: {file.Size}");
