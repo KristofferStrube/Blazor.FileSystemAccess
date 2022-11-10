@@ -1,0 +1,75 @@
+﻿@page "/AppendOnly"
+@inject IFileSystemAccessService FileSystemAccessService
+
+<PageTitle>File System Access - Append Only Example</PageTitle>
+
+@if (writePermissionState is PermissionState.Denied or PermissionState.Prompt)
+{
+    <button @onclick="OpenFilePicker" class="btn btn-primary">Open File Picker for Single File</button>
+}
+else
+{
+    <label for="cursorPosition">Cursor Position: </label>
+    <input id="cursorPosition" class="form-control" type="number" @bind-value=cursorPosition />
+    <br />
+    <label for="keyInput">Key Input: </label>
+    <input id="keyInput" class="form-control" value=@keyInput readonly @onkeydown=KeyDown />
+    <br />
+    <textarea style="width:100%;height:calc(100% - 180px);" value=@fileText disabled></textarea>
+}
+
+
+@code {
+    private const string allowedChars = "abcdefghijklmnopqrstuvxyz";
+    private string? fileText;
+    private int cursorPosition;
+    private string? keyInput;
+    private FileSystemFileHandle? fileHandle;
+    private PermissionState writePermissionState = PermissionState.Denied;
+
+    private async Task OpenFilePicker()
+    {
+        try
+        {
+            var options = new OpenFilePickerOptionsStartInWellKnownDirectory() { Multiple = false, StartIn = WellKnownDirectory.Downloads };
+            var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
+            fileHandle = fileHandles.Single();
+        }
+        catch (JSException ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            if (fileHandle != null)
+            {
+                writePermissionState = await fileHandle.RequestPermissionAsync(new() { Mode = FileSystemPermissionMode.ReadWrite });
+                if (writePermissionState is PermissionState.Granted)
+                {
+                    var file = await fileHandle.GetFileAsync();
+                    fileText = await file.TextAsync();
+                }
+            }
+        }
+    }
+
+    private async Task KeyDown(KeyboardEventArgs eventArgs)
+    {
+        if (!eventArgs.Repeat && fileHandle is not null && eventArgs.Key is { Length: 1 } key && allowedChars.Contains(char.Parse(key)))
+        {
+            var file = await fileHandle.GetFileAsync();
+            var writable = await fileHandle.CreateWritableAsync();
+            if (fileText is not null)
+            {
+                await writable.WriteAsync(fileText);
+            }
+            await writable.SeekAsync((ulong)cursorPosition);
+            await writable.WriteAsync(key);
+            await writable.CloseAsync();
+            file = await fileHandle.GetFileAsync();
+            fileText = await file.TextAsync();
+            keyInput = key;
+            StateHasChanged();
+        }
+    }
+}

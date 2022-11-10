@@ -32,7 +32,7 @@ dotnet add package KristofferStrube.Blazor.FileSystemAccess
 ```
 
 # Usage
-The package can be used in Blazor WebAssembly projects.
+The package can be used in Blazor WebAssembly and Blazor Server projects. (Note that streaming of big files is not supported in Blazor Server due to bandwidth problems.)
 ## Import
 You also need to reference the package in order to use it in your pages. This can be done in `_Import.razor` by adding the following.
 ```razor
@@ -54,9 +54,9 @@ await builder.Build().RunAsync();
 ## Inject in page
 Then the service can be injected in a page like so:
 ```razor
-@inject FileSystemAccessService FileSystemAccessService;
+@inject IFileSystemAccessService FileSystemAccessService;
 ```
-Then you can use `FileSystemAccessService` to open one of the three dialogs available in the FileSystemAccess API like this:
+Then you can use `IFileSystemAccessService` to open one of the three dialogs available in the FileSystemAccess API like this:
 ```razor
 <button @onclick="OpenAndReadFile">Open File Picker for Single File and Read</button>
 <br />
@@ -98,6 +98,8 @@ Then you can use `FileSystemAccessService` to open one of the three dialogs avai
 
 # Issues
 Feel free to open issues on the repository if you find any errors with the package or have wishes for features.
+
+A known issue is that using Streams to stream large amount of data in Blazor Server is not supported.
 
 # Related articles
 This repository was build with inspiration and help from the following series of articles:

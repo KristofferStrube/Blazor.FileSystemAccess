@@ -7,7 +7,7 @@ public static class IServiceCollectionExtensions
 {
     public static IServiceCollection AddFileSystemAccessService(this IServiceCollection serviceCollection)
     {
-        return serviceCollection.AddScoped<IFileSystemAccessService>();
+        return serviceCollection.AddScoped<IFileSystemAccessService, FileSystemAccessService>();
     }
     public static IServiceCollection AddFileSystemAccessServiceInProcess(this IServiceCollection serviceCollection)
     {

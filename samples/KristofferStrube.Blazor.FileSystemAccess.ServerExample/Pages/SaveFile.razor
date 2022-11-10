@@ -1,0 +1,50 @@
+﻿@page "/SaveFile"
+@inject IFileSystemAccessService FileSystemAccessService
+
+<PageTitle>File System Access - Save File</PageTitle>
+
+@if (FileHandle is null)
+{
+    <button @onclick="OpenFilePicker" class="btn btn-primary">Open Save File (override)</button>
+}
+else
+{
+    <textarea style="width:100%;height:calc(100% - 6px);" value=@FileText @oninput=TextAreaChanged></textarea>
+}
+
+
+@code {
+    protected string FileText = "";
+
+    protected FileSystemFileHandle? FileHandle;
+
+    protected async Task OpenFilePicker()
+    {
+        try
+        {
+            FileHandle = await FileSystemAccessService.ShowSaveFilePickerAsync();
+        }
+        catch (JSException ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            if (FileHandle != null)
+            {
+                var file = await FileHandle.GetFileAsync();
+                FileText = await file.TextAsync();
+            }
+        }
+    }
+
+    protected async Task TextAreaChanged(ChangeEventArgs eventArgs)
+    {
+        if (FileHandle is not null && eventArgs.Value is string value)
+        {
+            var writable = await FileHandle.CreateWritableAsync();
+            await writable.WriteAsync(value);
+            await writable.CloseAsync();
+        }
+    }
+}

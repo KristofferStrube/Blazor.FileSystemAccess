@@ -1,0 +1,24 @@
+﻿@page "/"
+@inject IFileSystemAccessService FileSystemAccessService
+
+<PageTitle>File System Access - Support Check</PageTitle>
+
+<div class="alert @(IsSupported ? "alert-success" : "alert-danger")">
+    <h2>
+        The File System Access API is @(IsSupported ? "" : "not") supported in this browser.
+    </h2>
+</div>
+
+
+@code {
+    private bool IsSupported;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            IsSupported = await FileSystemAccessService.IsSupportedAsync();
+            StateHasChanged();
+        }
+    }
+}

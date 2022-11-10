@@ -1,0 +1,35 @@
+@page "/MultipleFiles"
+@inject IFileSystemAccessService FileSystemAccessService
+
+<PageTitle>File System Access - Open Multiple Files</PageTitle>
+
+<button @onclick="OpenMultipleFilePicker" class="btn btn-primary">Open File Picker for Multiple Files</button>
+
+@if(filesRead is not null)
+{
+    <p>You selected @filesRead.Count files.</p>
+    <ul>
+        @foreach(var file in filesRead)
+        {
+            <li>@file</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<string>? filesRead;
+
+    private async Task OpenMultipleFilePicker()
+    {
+        try
+        {
+            var options = new OpenFilePickerOptionsStartInWellKnownDirectory() { Multiple = true, StartIn = WellKnownDirectory.Downloads };
+            var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
+            filesRead = (await Task.WhenAll(fileHandles.Select(async x => await x.GetNameAsync()))).ToList();
+        }
+        catch (JSException ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+}
