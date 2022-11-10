@@ -1,4 +1,5 @@
-﻿using KristofferStrube.Blazor.FileSystemAccess.Extensions;
+﻿using KristofferStrube.Blazor.FileAPI;
+using KristofferStrube.Blazor.FileSystemAccess.Extensions;
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
@@ -26,4 +27,16 @@ public class FileSystemFileHandleInProcess : FileSystemFileHandle
     public FileSystemHandleKind Kind => inProcessHelper.Invoke<FileSystemHandleKind>("getAttribute", JSReference, "kind");
 
     public string Name => inProcessHelper.Invoke<string>("getAttribute", JSReference, "name");
+
+    public new async Task<FileInProcess> GetFileAsync()
+    {
+        IJSInProcessObjectReference jSFile = await JSReference.InvokeAsync<IJSInProcessObjectReference>("getFile");
+        return await FileInProcess.CreateAsync(jSRuntime, jSFile);
+    }
+
+    public new async Task<FileSystemWritableFileStreamInProcess> CreateWritableAsync(FileSystemCreateWritableOptions? fileSystemCreateWritableOptions = null)
+    {
+        IJSInProcessObjectReference jSFileSystemWritableFileStream = await JSReference.InvokeAsync<IJSInProcessObjectReference>("createWritable", fileSystemCreateWritableOptions);
+        return new FileSystemWritableFileStreamInProcess(jSRuntime, inProcessHelper, jSFileSystemWritableFileStream);
+    }
 }

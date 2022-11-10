@@ -43,7 +43,7 @@ public class FileSystemAccessServiceInProcess : FileSystemAccessService, IFileSy
     private async Task<FileSystemFileHandleInProcess[]> ShowOpenFilePickerPrivateAsync(object? options)
     {
         IJSObjectReference helper = await helperTask.Value;
-        IJSObjectReference? jSFileHandles = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showOpenFilePicker", options);
+        IJSObjectReference jSFileHandles = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showOpenFilePicker", options);
         int length = await helper.InvokeAsync<int>("size", jSFileHandles);
         return await Task.WhenAll(
             Enumerable
@@ -86,7 +86,7 @@ public class FileSystemAccessServiceInProcess : FileSystemAccessService, IFileSy
 
     private async Task<FileSystemFileHandleInProcess> ShowSaveFilePickerPrivateAsync(object? options)
     {
-        IJSInProcessObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("window.showSaveFilePicker", options);
+        IJSInProcessObjectReference jSFileHandle = await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("window.showSaveFilePicker", options);
         return await FileSystemFileHandleInProcess.CreateAsync(jSRuntime, jSFileHandle);
     }
 
@@ -122,7 +122,7 @@ public class FileSystemAccessServiceInProcess : FileSystemAccessService, IFileSy
 
     private async Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerPrivateAsync(object? options)
     {
-        IJSInProcessObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("window.showDirectoryPicker", options);
+        IJSInProcessObjectReference jSFileHandle = await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("window.showDirectoryPicker", options);
         return await FileSystemDirectoryHandleInProcess.CreateAsync(jSRuntime, jSFileHandle);
     }
 
@@ -132,7 +132,7 @@ public class FileSystemAccessServiceInProcess : FileSystemAccessService, IFileSy
     /// <returns></returns>
     public new async Task<FileSystemDirectoryHandleInProcess> GetOriginPrivateDirectoryAsync()
     {
-        IJSInProcessObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("navigator.storage.getDirectory");
+        IJSInProcessObjectReference jSFileHandle = await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("navigator.storage.getDirectory");
         return await FileSystemDirectoryHandleInProcess.CreateAsync(jSRuntime, jSFileHandle);
     }
 }

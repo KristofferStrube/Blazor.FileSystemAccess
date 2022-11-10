@@ -23,11 +23,15 @@ public class FileSystemDirectoryHandleInProcess : FileSystemDirectoryHandle
         JSReference = jSReference;
     }
 
+    public FileSystemHandleKind Kind => inProcessHelper.Invoke<FileSystemHandleKind>("getAttribute", JSReference, "kind");
+
+    public string Name => inProcessHelper.Invoke<string>("getAttribute", JSReference, "name");
+
     public new async Task<FileSystemHandleInProcess[]> ValuesAsync()
     {
         IJSObjectReference helper = await helperTask.Value;
-        IJSObjectReference? jSValues = await JSReference.InvokeAsync<IJSObjectReference>("values");
-        IJSObjectReference? jSEntries = await helper.InvokeAsync<IJSObjectReference>("arrayFrom", jSValues);
+        IJSObjectReference jSValues = await JSReference.InvokeAsync<IJSObjectReference>("values");
+        IJSObjectReference jSEntries = await helper.InvokeAsync<IJSObjectReference>("arrayFrom", jSValues);
         int length = await helper.InvokeAsync<int>("size", jSEntries);
         return await Task.WhenAll(
             Enumerable

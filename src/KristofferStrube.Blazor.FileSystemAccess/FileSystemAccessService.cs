@@ -46,7 +46,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     private async Task<FileSystemFileHandle[]> ShowOpenFilePickerPrivateAsync(object? options)
     {
         IJSObjectReference helper = await helperTask.Value;
-        IJSObjectReference? jSFileHandles = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showOpenFilePicker", options);
+        IJSObjectReference jSFileHandles = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showOpenFilePicker", options);
         int length = await helper.InvokeAsync<int>("size", jSFileHandles);
         return await Task.WhenAll(
             Enumerable
@@ -89,7 +89,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
 
     private async Task<FileSystemFileHandle> ShowSaveFilePickerPrivateAsync(object? options)
     {
-        IJSObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showSaveFilePicker", options);
+        IJSObjectReference jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showSaveFilePicker", options);
         return new FileSystemFileHandle(jSRuntime, jSFileHandle);
     }
 
@@ -125,7 +125,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
 
     private async Task<FileSystemDirectoryHandle> ShowDirectoryPickerPrivateAsync(object? options)
     {
-        IJSObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showDirectoryPicker", options);
+        IJSObjectReference jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showDirectoryPicker", options);
         return new FileSystemDirectoryHandle(jSRuntime, jSFileHandle);
     }
 
@@ -135,7 +135,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     /// <returns></returns>
     public async Task<FileSystemDirectoryHandle> GetOriginPrivateDirectoryAsync()
     {
-        IJSObjectReference? jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("navigator.storage.getDirectory");
+        IJSObjectReference jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("navigator.storage.getDirectory");
         return new FileSystemDirectoryHandle(jSRuntime, jSFileHandle);
     }
 

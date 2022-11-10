@@ -1,5 +1,4 @@
-﻿using KristofferStrube.Blazor.FileAPI;
-using Microsoft.JSInterop;
+﻿using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
@@ -17,19 +16,13 @@ public class FileSystemFileHandle : FileSystemHandle
 
     public async Task<FileAPI.File> GetFileAsync()
     {
-        IJSObjectReference? jSFile = await JSReference.InvokeAsync<IJSObjectReference>("getFile");
+        IJSObjectReference jSFile = await JSReference.InvokeAsync<IJSObjectReference>("getFile");
         return FileAPI.File.Create(jSRuntime, jSFile);
-    }
-
-    public async Task<FileInProcess> GetFileInProcessAsync()
-    {
-        IJSInProcessObjectReference? jSFile = await JSReference.InvokeAsync<IJSInProcessObjectReference>("getFile");
-        return await FileInProcess.CreateAsync(jSRuntime, jSFile);
     }
 
     public async Task<FileSystemWritableFileStream> CreateWritableAsync(FileSystemCreateWritableOptions? fileSystemCreateWritableOptions = null)
     {
-        IJSObjectReference? jSFileSystemWritableFileStream = await JSReference.InvokeAsync<IJSObjectReference>("createWritable", fileSystemCreateWritableOptions);
+        IJSObjectReference jSFileSystemWritableFileStream = await JSReference.InvokeAsync<IJSObjectReference>("createWritable", fileSystemCreateWritableOptions);
         return new FileSystemWritableFileStream(jSRuntime, jSFileSystemWritableFileStream);
     }
 }

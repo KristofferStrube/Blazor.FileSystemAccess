@@ -17,8 +17,8 @@ public class FileSystemDirectoryHandle : FileSystemHandle
     public async Task<FileSystemHandle[]> ValuesAsync()
     {
         IJSObjectReference helper = await helperTask.Value;
-        IJSObjectReference? jSValues = await JSReference.InvokeAsync<IJSObjectReference>("values");
-        IJSObjectReference? jSEntries = await helper.InvokeAsync<IJSObjectReference>("arrayFrom", jSValues);
+        IJSObjectReference jSValues = await JSReference.InvokeAsync<IJSObjectReference>("values");
+        IJSObjectReference jSEntries = await helper.InvokeAsync<IJSObjectReference>("arrayFrom", jSValues);
         int length = await helper.InvokeAsync<int>("size", jSEntries);
         return await Task.WhenAll(
             Enumerable
@@ -32,13 +32,13 @@ public class FileSystemDirectoryHandle : FileSystemHandle
 
     public async Task<FileSystemFileHandle> GetFileHandleAsync(string name, FileSystemGetFileOptions? options = null)
     {
-        IJSObjectReference? jSFileSystemFileHandle = await JSReference.InvokeAsync<IJSObjectReference>("getFileHandle", name, options);
+        IJSObjectReference jSFileSystemFileHandle = await JSReference.InvokeAsync<IJSObjectReference>("getFileHandle", name, options);
         return new FileSystemFileHandle(jSRuntime, jSFileSystemFileHandle);
     }
 
     public async Task<FileSystemDirectoryHandle> GetDirectoryHandleAsync(string name, FileSystemGetDirectoryOptions? options = null)
     {
-        IJSObjectReference? jSFileSystemDirectoryHandle = await JSReference.InvokeAsync<IJSObjectReference>("getDirectoryHandle", name, options);
+        IJSObjectReference jSFileSystemDirectoryHandle = await JSReference.InvokeAsync<IJSObjectReference>("getDirectoryHandle", name, options);
         return new FileSystemDirectoryHandle(jSRuntime, jSFileSystemDirectoryHandle);
     }
 
