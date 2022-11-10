@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0] - 2022-11-10
 ### Added
 - Added interfaces for `FileSystemAccessService` and `FileSystemAccessServiceInProcess` so that they are test friendly.
-- Added the following InProcess variants of wrapper classes: `FileSystemDirectoryHandle`, `FileSystemFileHandle`, `FileSystemHandle` and `FileSystemWritableFileStream`.
+- Added InProcess variants of the following wrapper classes: `FileSystemDirectoryHandle`, `FileSystemFileHandle`, `FileSystemHandle` and `FileSystemWritableFileStream`.
 
 ### Changed
 - Changed the Blazor WebAssembly compatible service to be named `FileSystemAccessServiceInProcess` instead of `FileSystemAccessService` so that Blazor Server support is the standard.
