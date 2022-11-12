@@ -1,0 +1,58 @@
+﻿@page "/ViewPDF"
+
+@implements IAsyncDisposable
+
+@inject IFileSystemAccessService FileSystemAccessService
+@inject IURLService URL
+
+<PageTitle>File System Access - View PDF</PageTitle>
+
+<button @onclick="OpenFilePicker" class="btn btn-primary">Open PDF</button>
+<br />
+<br />
+@if (fileHandle is not null)
+{
+    <iframe style="width:100%;height:calc(100vh - 180px);" src="@pdfURL"></iframe>
+}
+
+@code {
+    private string pdfURL = "";
+    private FileSystemFileHandle? fileHandle;
+
+    private async Task OpenFilePicker()
+    {
+        try
+        {
+            var options = new OpenFilePickerOptionsStartInWellKnownDirectory()
+                {
+                    Multiple = false,
+                    StartIn = WellKnownDirectory.Downloads,
+                    Types = new FilePickerAcceptType[] {
+                        new() {
+                            Description = "PDFs",
+                            Accept = new() { { "application/pdf", new string[] { ".pdf" } } }
+                        }
+                    }
+                };
+            var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
+            fileHandle = fileHandles.Single();
+        }
+        catch (JSException ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            if (fileHandle != null)
+            {
+                var file = await fileHandle.GetFileAsync();
+                pdfURL = await URL.CreateObjectURLAsync(file);
+            }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await URL.RevokeObjectURLAsync(pdfURL);
+    }
+}
