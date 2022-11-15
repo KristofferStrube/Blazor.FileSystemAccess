@@ -1,4 +1,5 @@
 ﻿using KristofferStrube.Blazor.FileSystemAccess.Extensions;
+using KristofferStrube.Blazor.FileSystemAccess.Options;
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
@@ -11,9 +12,9 @@ public class FileSystemWritableFileStreamInProcess : FileSystemWritableFileStrea
     public new IJSInProcessObjectReference JSReference;
     protected readonly IJSInProcessObjectReference inProcessHelper;
 
-    public static async Task<FileSystemWritableFileStreamInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference)
+    public static async Task<FileSystemWritableFileStreamInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, FileSystemAccessOptions options)
     {
-        IJSInProcessObjectReference inProcessHelper = await jSRuntime.GetInProcessHelperAsync();
+        IJSInProcessObjectReference inProcessHelper = await jSRuntime.GetInProcessHelperAsync(options);
         return new FileSystemWritableFileStreamInProcess(jSRuntime, inProcessHelper, jSReference);
     }
 

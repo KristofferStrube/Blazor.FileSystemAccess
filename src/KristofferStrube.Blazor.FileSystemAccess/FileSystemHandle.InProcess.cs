@@ -1,4 +1,5 @@
 ﻿using KristofferStrube.Blazor.FileSystemAccess.Extensions;
+using KristofferStrube.Blazor.FileSystemAccess.Options;
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
@@ -11,13 +12,13 @@ public class FileSystemHandleInProcess : FileSystemFileHandle
     public new IJSInProcessObjectReference JSReference;
     protected readonly IJSInProcessObjectReference inProcessHelper;
 
-    public static async Task<FileSystemHandleInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference)
+    public static async Task<FileSystemHandleInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, FileSystemAccessOptions? options)
     {
-        IJSInProcessObjectReference inProcessHelper = await jSRuntime.GetInProcessHelperAsync();
-        return new FileSystemHandleInProcess(jSRuntime, inProcessHelper, jSReference);
+        IJSInProcessObjectReference inProcessHelper = await jSRuntime.GetInProcessHelperAsync(options);
+        return new FileSystemHandleInProcess(jSRuntime, inProcessHelper, jSReference, options);
     }
 
-    internal FileSystemHandleInProcess(IJSRuntime jSRuntime, IJSInProcessObjectReference inProcessHelper, IJSInProcessObjectReference jSReference) : base(jSRuntime, jSReference)
+    internal FileSystemHandleInProcess(IJSRuntime jSRuntime, IJSInProcessObjectReference inProcessHelper, IJSInProcessObjectReference jSReference, FileSystemAccessOptions? options) : base(jSRuntime, jSReference, options)
     {
         this.inProcessHelper = inProcessHelper;
         JSReference = jSReference;

@@ -1,4 +1,6 @@
-﻿using Microsoft.JSInterop;
+﻿using KristofferStrube.Blazor.FileSystemAccess.Options;
+using Microsoft.Extensions.Options;
+using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
@@ -7,12 +9,23 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 /// </summary>
 public class FileSystemDirectoryHandle : FileSystemHandle
 {
+
     public static new FileSystemDirectoryHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference)
     {
-        return new FileSystemDirectoryHandle(jSRuntime, jSReference);
+        return Create(jSRuntime, jSReference, Create);
     }
 
-    internal FileSystemDirectoryHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference) : base(jSRuntime, jSReference) { }
+    public static new FileSystemDirectoryHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference, IServiceProvider services)
+    {
+        return Create(jSRuntime, jSReference, services, Create);
+    }
+
+    public static new FileSystemDirectoryHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions? options)
+    {
+        return new(jSRuntime, jSReference, options);
+    }
+
+    internal FileSystemDirectoryHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions? options) : base(jSRuntime, jSReference, options) { }
 
     public async Task<FileSystemHandle[]> ValuesAsync()
     {
@@ -24,7 +37,10 @@ public class FileSystemDirectoryHandle : FileSystemHandle
             Enumerable
                 .Range(0, length)
                 .Select(async i =>
-                    new FileSystemHandle(jSRuntime, await jSEntries.InvokeAsync<IJSObjectReference>("at", i))
+                    new FileSystemHandle(
+                        jSRuntime,
+                        await jSEntries.InvokeAsync<IJSObjectReference>("at", i),
+                        this.options)
                 )
                 .ToArray()
         );
@@ -33,13 +49,19 @@ public class FileSystemDirectoryHandle : FileSystemHandle
     public async Task<FileSystemFileHandle> GetFileHandleAsync(string name, FileSystemGetFileOptions? options = null)
     {
         IJSObjectReference jSFileSystemFileHandle = await JSReference.InvokeAsync<IJSObjectReference>("getFileHandle", name, options);
-        return new FileSystemFileHandle(jSRuntime, jSFileSystemFileHandle);
+        return new FileSystemFileHandle(
+            jSRuntime,
+            jSFileSystemFileHandle,
+            this.options);
     }
 
     public async Task<FileSystemDirectoryHandle> GetDirectoryHandleAsync(string name, FileSystemGetDirectoryOptions? options = null)
     {
         IJSObjectReference jSFileSystemDirectoryHandle = await JSReference.InvokeAsync<IJSObjectReference>("getDirectoryHandle", name, options);
-        return new FileSystemDirectoryHandle(jSRuntime, jSFileSystemDirectoryHandle);
+        return new FileSystemDirectoryHandle(
+            jSRuntime,
+            jSFileSystemDirectoryHandle,
+            this.options);
     }
 
     public async Task RemoveEntryAsync(string name, FileSystemRemoveOptions? options = null)

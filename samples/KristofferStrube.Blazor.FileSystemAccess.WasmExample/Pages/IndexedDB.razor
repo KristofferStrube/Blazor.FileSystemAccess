@@ -3,6 +3,7 @@
 @inject IFileSystemAccessServiceInProcess FileSystemAccessService
 @inject IndexedDBManager DbManager
 @inject IJSRuntime JSRuntime
+@inject IServiceProvider Services;
 
 <PageTitle>File System Access - IndexedDB</PageTitle>
 
@@ -40,8 +41,13 @@ In this sample we store the references to files that we have previously opened i
         var length = await JSRuntime.InvokeAsync<int>("getAttribute", entries, "length");
         StoredFileHandles = (await Task.WhenAll(Enumerable
             .Range(0, length)
-            .Select(async i => (false, await FileSystemFileHandleInProcess.CreateAsync(JSRuntime, await entries.InvokeAsync<IJSInProcessObjectReference>("at", i))))
-            )).ToList();
+            .Select(async i => (
+                false,
+                await FileSystemFileHandleInProcess.CreateAsync(
+                    JSRuntime,
+                    await entries.InvokeAsync<IJSInProcessObjectReference>("at", i),
+                    this.Services
+            ))))).ToList();
     }
 
     protected async Task OpenFilePicker()
