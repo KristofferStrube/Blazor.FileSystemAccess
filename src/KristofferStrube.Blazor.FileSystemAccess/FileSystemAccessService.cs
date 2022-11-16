@@ -1,4 +1,6 @@
 using KristofferStrube.Blazor.FileSystemAccess.Extensions;
+using KristofferStrube.Blazor.FileSystemAccess.Options;
+using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
@@ -7,10 +9,13 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
 {
     protected readonly Lazy<Task<IJSObjectReference>> helperTask;
     protected readonly IJSRuntime jSRuntime;
+    protected readonly FileSystemAccessOptions options;
 
-    public FileSystemAccessService(IJSRuntime jSRuntime)
+    public FileSystemAccessService(IJSRuntime jSRuntime, IOptions<FileSystemAccessOptions> options)
     {
-        helperTask = new(() => jSRuntime.GetHelperAsync());
+        this.options = options.Value;
+
+        helperTask = new(() => jSRuntime.GetHelperAsync(this.options));
         this.jSRuntime = jSRuntime;
     }
 
@@ -52,7 +57,10 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
             Enumerable
                 .Range(0, length)
                 .Select(async i =>
-                    new FileSystemFileHandle(jSRuntime, await jSFileHandles.InvokeAsync<IJSObjectReference>("at", i))
+                    new FileSystemFileHandle(
+                        jSRuntime,
+                        await jSFileHandles.InvokeAsync<IJSObjectReference>("at", i),
+                        this.options)
                 )
                 .ToArray()
         );
@@ -90,7 +98,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     private async Task<FileSystemFileHandle> ShowSaveFilePickerPrivateAsync(object? options)
     {
         IJSObjectReference jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showSaveFilePicker", options);
-        return new FileSystemFileHandle(jSRuntime, jSFileHandle);
+        return new FileSystemFileHandle(jSRuntime, jSFileHandle, this.options);
     }
 
     /// <summary>
@@ -126,7 +134,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     private async Task<FileSystemDirectoryHandle> ShowDirectoryPickerPrivateAsync(object? options)
     {
         IJSObjectReference jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("window.showDirectoryPicker", options);
-        return new FileSystemDirectoryHandle(jSRuntime, jSFileHandle);
+        return new FileSystemDirectoryHandle(jSRuntime, jSFileHandle, this.options);
     }
 
     /// <summary>
@@ -136,7 +144,7 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
     public async Task<FileSystemDirectoryHandle> GetOriginPrivateDirectoryAsync()
     {
         IJSObjectReference jSFileHandle = await jSRuntime.InvokeAsync<IJSObjectReference>("navigator.storage.getDirectory");
-        return new FileSystemDirectoryHandle(jSRuntime, jSFileHandle);
+        return new FileSystemDirectoryHandle(jSRuntime, jSFileHandle, this.options);
     }
 
     /// <summary>
@@ -150,6 +158,46 @@ public class FileSystemAccessService : IAsyncDisposable, IFileSystemAccessServic
             await jSRuntime.InvokeAsync<bool>("window.hasOwnProperty", "showSaveFilePicker") &
             await jSRuntime.InvokeAsync<bool>("window.hasOwnProperty", "showDirectoryPicker");
     }
+
+    #region Create Handle Instances
+
+    /// <summary>
+    /// Create a FileSystemHandle wrapper for JS handle.
+    /// </summary>
+    public FileSystemHandle CreateFileSystemHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference) 
+        => FileSystemHandle.Create(jSRuntime, jSReference, this.options);
+
+    /// <summary>
+    /// Create a FileSystemFileHandle wrapper for JS handle.
+    /// </summary>
+    public FileSystemFileHandle CreateFileHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+        => FileSystemFileHandle.Create(jSRuntime, jSReference, this.options);
+
+    /// <summary>
+    /// Create a FileSystemFileHandle wrapper for JS handle.
+    /// </summary>
+    public async Task<FileSystemHandleInProcess> CreateFileSystemHandleInProcessAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference)
+        => await FileSystemHandleInProcess.CreateAsync(jSRuntime, jSReference, this.options);
+
+    /// <summary>
+    /// Create a FileSystemFileHandleInProcess wrapper for JS handle.
+    /// </summary>
+    public async Task<FileSystemFileHandleInProcess> CreateFileHandleInProcessAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference)
+        => await FileSystemFileHandleInProcess.CreateAsync(jSRuntime, jSReference, this.options);
+
+    /// <summary>
+    /// Create a FileSystemDirectoryHandle wrapper for JS handle.
+    /// </summary>
+    public FileSystemDirectoryHandle CreateDirectoryHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+        => FileSystemDirectoryHandle.Create(jSRuntime, jSReference, this.options);
+
+    /// <summary>
+    /// Create a FileSystemDirectoryHandleInProcess wrapper for JS handle.
+    /// </summary>
+    public async Task<FileSystemDirectoryHandleInProcess> CreateDirectoryHandleInProcessAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference)
+        => await FileSystemDirectoryHandleInProcess.CreateAsync(jSRuntime, jSReference, this.options);
+
+    #endregion
 
     public async ValueTask DisposeAsync()
     {

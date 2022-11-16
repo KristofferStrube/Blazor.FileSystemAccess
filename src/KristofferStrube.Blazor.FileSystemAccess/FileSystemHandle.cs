@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using KristofferStrube.Blazor.FileSystemAccess.Options;
+using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
@@ -7,12 +8,15 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 /// </summary>
 public class FileSystemHandle : BaseJSWrapper
 {
-    public static FileSystemHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference)
-    {
-        return new FileSystemHandle(jSRuntime, jSReference);
-    }
 
-    internal FileSystemHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference) : base(jSRuntime, jSReference) { }
+    [Obsolete("Use CreateFileSystemHandle from IFileSystemAccessService instead.")]
+    public static FileSystemHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+        => Create(jSRuntime, jSReference, null);
+
+    internal static FileSystemHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions? options)
+        => new(jSRuntime, jSReference, options);
+
+    internal FileSystemHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions? options) : base(jSRuntime, jSReference, options) { }
 
     public async Task<FileSystemHandleKind> GetKindAsync()
     {

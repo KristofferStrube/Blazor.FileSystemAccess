@@ -1,3 +1,5 @@
+using KristofferStrube.Blazor.FileSystemAccess.Options;
+using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
@@ -6,7 +8,7 @@ public class FileSystemAccessServiceInProcess : FileSystemAccessService, IFileSy
 {
     protected new readonly IJSInProcessRuntime jSRuntime;
 
-    public FileSystemAccessServiceInProcess(IJSInProcessRuntime jSRuntime) : base(jSRuntime)
+    public FileSystemAccessServiceInProcess(IJSInProcessRuntime jSRuntime, IOptions<FileSystemAccessOptions> options) : base(jSRuntime, options)
     {
         this.jSRuntime = jSRuntime;
     }
@@ -49,7 +51,10 @@ public class FileSystemAccessServiceInProcess : FileSystemAccessService, IFileSy
             Enumerable
                 .Range(0, length)
                 .Select(async i =>
-                    await FileSystemFileHandleInProcess.CreateAsync(jSRuntime, await jSFileHandles.InvokeAsync<IJSInProcessObjectReference>("at", i))
+                    await FileSystemFileHandleInProcess.CreateAsync(
+                        jSRuntime,
+                        await jSFileHandles.InvokeAsync<IJSInProcessObjectReference>("at", i),
+                        this.options)
                 )
                 .ToArray()
         );
@@ -87,7 +92,7 @@ public class FileSystemAccessServiceInProcess : FileSystemAccessService, IFileSy
     private async Task<FileSystemFileHandleInProcess> ShowSaveFilePickerPrivateAsync(object? options)
     {
         IJSInProcessObjectReference jSFileHandle = await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("window.showSaveFilePicker", options);
-        return await FileSystemFileHandleInProcess.CreateAsync(jSRuntime, jSFileHandle);
+        return await FileSystemFileHandleInProcess.CreateAsync(jSRuntime, jSFileHandle, this.options);
     }
 
     /// <summary>
@@ -123,7 +128,7 @@ public class FileSystemAccessServiceInProcess : FileSystemAccessService, IFileSy
     private async Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerPrivateAsync(object? options)
     {
         IJSInProcessObjectReference jSFileHandle = await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("window.showDirectoryPicker", options);
-        return await FileSystemDirectoryHandleInProcess.CreateAsync(jSRuntime, jSFileHandle);
+        return await FileSystemDirectoryHandleInProcess.CreateAsync(jSRuntime, jSFileHandle, this.options);
     }
 
     /// <summary>
@@ -133,6 +138,6 @@ public class FileSystemAccessServiceInProcess : FileSystemAccessService, IFileSy
     public new async Task<FileSystemDirectoryHandleInProcess> GetOriginPrivateDirectoryAsync()
     {
         IJSInProcessObjectReference jSFileHandle = await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("navigator.storage.getDirectory");
-        return await FileSystemDirectoryHandleInProcess.CreateAsync(jSRuntime, jSFileHandle);
+        return await FileSystemDirectoryHandleInProcess.CreateAsync(jSRuntime, jSFileHandle, this.options);
     }
 }

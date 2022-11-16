@@ -42,7 +42,7 @@ In this sample we store the references to files that we have previously opened i
         StoredFileHandles = (await Task.WhenAll(Enumerable
             .Range(0, length)
             .Select(async i => {
-                var fileHandle = FileSystemFileHandle.Create(JSRuntime, await entries.InvokeAsync<IJSObjectReference>("at", i));
+                var fileHandle = this.FileSystemAccessService.CreateFileHandle(JSRuntime, await entries.InvokeAsync<IJSObjectReference>("at", i));
                 return (false, fileHandle, await fileHandle.GetNameAsync());
             })
             )).ToList();

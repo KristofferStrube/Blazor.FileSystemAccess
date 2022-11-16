@@ -13,7 +13,7 @@ public class FileSystemWritableFileStreamInProcess : FileSystemWritableFileStrea
 
     public static async Task<FileSystemWritableFileStreamInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference)
     {
-        IJSInProcessObjectReference inProcessHelper = await jSRuntime.GetInProcessHelperAsync();
+        IJSInProcessObjectReference inProcessHelper = await jSRuntime.GetInProcessHelperAsync(null);
         return new FileSystemWritableFileStreamInProcess(jSRuntime, inProcessHelper, jSReference);
     }
 
