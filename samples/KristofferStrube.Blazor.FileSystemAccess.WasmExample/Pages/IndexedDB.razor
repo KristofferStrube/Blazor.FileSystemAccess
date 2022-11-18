@@ -40,7 +40,10 @@ In this sample we store the references to files that we have previously opened i
         var length = await JSRuntime.InvokeAsync<int>("getAttribute", entries, "length");
         StoredFileHandles = (await Task.WhenAll(Enumerable
             .Range(0, length)
-            .Select(async i => (false, await FileSystemFileHandleInProcess.CreateAsync(JSRuntime, await entries.InvokeAsync<IJSInProcessObjectReference>("at", i))))
+            .Select(async i => (false, 
+                await FileSystemFileHandleInProcess.CreateAsync(
+                    JSRuntime,
+                    await entries.InvokeAsync<IJSInProcessObjectReference>("at", i))))
             )).ToList();
     }
 

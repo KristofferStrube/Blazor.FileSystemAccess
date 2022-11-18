@@ -12,12 +12,15 @@ public class FileSystemDirectoryHandleInProcess : FileSystemDirectoryHandle
     protected readonly IJSInProcessObjectReference inProcessHelper;
 
     public static async Task<FileSystemDirectoryHandleInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference)
+        => await CreateAsync(jSRuntime, jSReference, FileSystemAccessOptions.DefaultInstance);
+
+    public static async Task<FileSystemDirectoryHandleInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, FileSystemAccessOptions options)
     {
-        IJSInProcessObjectReference inProcessHelper = await jSRuntime.GetInProcessHelperAsync();
-        return new FileSystemDirectoryHandleInProcess(jSRuntime, inProcessHelper, jSReference);
+        IJSInProcessObjectReference inProcessHelper = await jSRuntime.GetInProcessHelperAsync(options);
+        return new FileSystemDirectoryHandleInProcess(jSRuntime, inProcessHelper, jSReference, options);
     }
 
-    internal FileSystemDirectoryHandleInProcess(IJSRuntime jSRuntime, IJSInProcessObjectReference inProcessHelper, IJSInProcessObjectReference jSReference) : base(jSRuntime, jSReference)
+    internal FileSystemDirectoryHandleInProcess(IJSRuntime jSRuntime, IJSInProcessObjectReference inProcessHelper, IJSInProcessObjectReference jSReference, FileSystemAccessOptions options) : base(jSRuntime, jSReference, options)
     {
         this.inProcessHelper = inProcessHelper;
         JSReference = jSReference;
@@ -37,7 +40,10 @@ public class FileSystemDirectoryHandleInProcess : FileSystemDirectoryHandle
             Enumerable
                 .Range(0, length)
                 .Select(async i =>
-                    await FileSystemHandleInProcess.CreateAsync(jSRuntime, await jSEntries.InvokeAsync<IJSInProcessObjectReference>("at", i))
+                    await FileSystemHandleInProcess.CreateAsync(
+                        jSRuntime,
+                        await jSEntries.InvokeAsync<IJSInProcessObjectReference>("at", i),
+                        this.options)
                 )
                 .ToArray()
         );
@@ -46,12 +52,12 @@ public class FileSystemDirectoryHandleInProcess : FileSystemDirectoryHandle
     public new async Task<FileSystemFileHandleInProcess> GetFileHandleAsync(string name, FileSystemGetFileOptions? options = null)
     {
         IJSInProcessObjectReference jSFileSystemFileHandle = await JSReference.InvokeAsync<IJSInProcessObjectReference>("getFileHandle", name, options);
-        return new FileSystemFileHandleInProcess(jSRuntime, inProcessHelper, jSFileSystemFileHandle);
+        return new FileSystemFileHandleInProcess(jSRuntime, inProcessHelper, jSFileSystemFileHandle, this.options);
     }
 
     public new async Task<FileSystemDirectoryHandleInProcess> GetDirectoryHandleAsync(string name, FileSystemGetDirectoryOptions? options = null)
     {
         IJSInProcessObjectReference jSFileSystemDirectoryHandle = await JSReference.InvokeAsync<IJSInProcessObjectReference>("getDirectoryHandle", name, options);
-        return new FileSystemDirectoryHandleInProcess(jSRuntime, inProcessHelper, jSFileSystemDirectoryHandle);
+        return new FileSystemDirectoryHandleInProcess(jSRuntime, inProcessHelper, jSFileSystemDirectoryHandle, this.options);
     }
 }

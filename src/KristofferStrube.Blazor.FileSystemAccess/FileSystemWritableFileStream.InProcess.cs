@@ -12,8 +12,11 @@ public class FileSystemWritableFileStreamInProcess : FileSystemWritableFileStrea
     protected readonly IJSInProcessObjectReference inProcessHelper;
 
     public static async Task<FileSystemWritableFileStreamInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference)
+        => await CreateAsync(jSRuntime, jSReference, FileSystemAccessOptions.DefaultInstance);
+
+    public static async Task<FileSystemWritableFileStreamInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, FileSystemAccessOptions options)
     {
-        IJSInProcessObjectReference inProcessHelper = await jSRuntime.GetInProcessHelperAsync();
+        IJSInProcessObjectReference inProcessHelper = await jSRuntime.GetInProcessHelperAsync(options);
         return new FileSystemWritableFileStreamInProcess(jSRuntime, inProcessHelper, jSReference);
     }
 
