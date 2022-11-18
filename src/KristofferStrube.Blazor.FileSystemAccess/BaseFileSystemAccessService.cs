@@ -2,7 +2,7 @@
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
-internal abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHandle, TObjReference> : IFileSystemAccessService<TFsFileHandle, TFsDirectoryHandle, TObjReference>
+public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHandle, TObjReference> : IFileSystemAccessService<TFsFileHandle, TFsDirectoryHandle, TObjReference>
     where TFsFileHandle : FileSystemFileHandle
     where TFsDirectoryHandle : FileSystemDirectoryHandle
     where TObjReference : IJSObjectReference

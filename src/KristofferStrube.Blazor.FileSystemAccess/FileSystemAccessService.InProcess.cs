@@ -2,7 +2,7 @@ using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
-internal class FileSystemAccessServiceInProcess :
+public class FileSystemAccessServiceInProcess :
     BaseFileSystemAccessService<
         FileSystemFileHandleInProcess,
         FileSystemDirectoryHandleInProcess,
