@@ -15,7 +15,8 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddFileSystemAccessServiceInProcess(options =>
 {
     // The file at this path in this example is manually copied to wwwroot folder
-    // options.ScriptPath = $"/content/custom-path/{FileSystemAccessOptions.DefaultNamespace}.js";
+    // options.BasePath = "content/";
+    // options.ScriptPath = $"custom-path/{FileSystemAccessOptions.DefaultNamespace}.js";
 });
 
 builder.Services.AddURLServiceInProcess();
