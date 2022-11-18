@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
+using System.Diagnostics;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
@@ -13,10 +13,7 @@ public static class IServiceCollectionExtensions
 
     public static IServiceCollection AddFileSystemAccessService(this IServiceCollection serviceCollection, Action<FileSystemAccessOptions>? configure)
     {
-        if (configure is not null)
-        {
-            serviceCollection.Configure(configure);
-        } 
+        ConfigureFsaOptions(serviceCollection, configure);
 
         return serviceCollection.AddScoped<IFileSystemAccessService, FileSystemAccessService>();
     }
@@ -28,17 +25,23 @@ public static class IServiceCollectionExtensions
 
     public static IServiceCollection AddFileSystemAccessServiceInProcess(this IServiceCollection serviceCollection, Action<FileSystemAccessOptions>? configure)
     {
-
-        if (configure is not null)
-        {
-            serviceCollection.Configure(configure);
-        }
+        ConfigureFsaOptions(serviceCollection, configure);
 
         return serviceCollection
-            .AddScoped<IFileSystemAccessServiceInProcess>(
-                sp => new FileSystemAccessServiceInProcess(
-                    (IJSInProcessRuntime)sp.GetRequiredService<IJSRuntime>(),
-                    sp.GetRequiredService<IOptions<FileSystemAccessOptions>>()))
-            .AddScoped<IFileSystemAccessService>(sp => sp.GetRequiredService<IFileSystemAccessServiceInProcess>());
+            .AddScoped<IFileSystemAccessServiceInProcess, FileSystemAccessServiceInProcess>();
+            //.AddScoped(sp =>
+            //{
+            //    var service = sp.GetRequiredService<IFileSystemAccessServiceInProcess>();
+            //    return (IFileSystemAccessService)service;
+            //});
     }
+
+    static void ConfigureFsaOptions(IServiceCollection services, Action<FileSystemAccessOptions>? configure)
+    {
+        if (configure is null) { return; }
+
+        services.Configure(configure);
+        configure(FileSystemAccessOptions.DefaultInstance);
+    }
+
 }

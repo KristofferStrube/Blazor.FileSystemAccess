@@ -2,29 +2,38 @@
 
 namespace KristofferStrube.Blazor.FileSystemAccess
 {
-    public interface IFileSystemAccessService
+
+    public interface IFileSystemAccessService<TFsFileHandle, TFsDirectoryHandle, TObjReference> : IAsyncDisposable
+        where TFsFileHandle : FileSystemFileHandle
+        where TFsDirectoryHandle : FileSystemDirectoryHandle
+        where TObjReference : IJSObjectReference
     {
-        ValueTask DisposeAsync();
-        Task<FileSystemDirectoryHandle> GetOriginPrivateDirectoryAsync();
+        Task<TFsDirectoryHandle> GetOriginPrivateDirectoryAsync();
         Task<bool> IsSupportedAsync();
-        Task<FileSystemDirectoryHandle> ShowDirectoryPickerAsync();
-        Task<FileSystemDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInFileSystemHandle? directoryPickerOptions = null);
-        Task<FileSystemDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInWellKnownDirectory? directoryPickerOptions = null);
-        Task<FileSystemFileHandle[]> ShowOpenFilePickerAsync();
-        Task<FileSystemFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions = null);
-        Task<FileSystemFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions = null);
-        Task<FileSystemFileHandle> ShowSaveFilePickerAsync();
-        Task<FileSystemFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInFileSystemHandle? saveFilePickerOptions = null);
-        Task<FileSystemFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInWellKnownDirectory? saveFilePickerOptions = null);
 
-        #region Create Handle Instances 
+        Task<TFsDirectoryHandle> ShowDirectoryPickerAsync();
+        Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInFileSystemHandle? directoryPickerOptions);
+        Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInWellKnownDirectory? directoryPickerOptions);
+        Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(FileSystemAccessOptions fasOptions);
+        Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInFileSystemHandle? directoryPickerOptions, FileSystemAccessOptions fasOptions);
+        Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInWellKnownDirectory? directoryPickerOptions, FileSystemAccessOptions fasOptions);
 
-        FileSystemDirectoryHandle CreateDirectoryHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference);
-        FileSystemFileHandle CreateFileHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference);
-        Task<FileSystemFileHandleInProcess> CreateFileHandleInProcessAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference);
-        FileSystemHandle CreateFileSystemHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference);
-        Task<FileSystemHandleInProcess> CreateFileSystemHandleInProcessAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference);
+        Task<TFsFileHandle[]> ShowOpenFilePickerAsync();
+        Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions);
+        Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions);
+        Task<TFsFileHandle[]> ShowOpenFilePickerAsync(FileSystemAccessOptions fasOptions);
+        Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions, FileSystemAccessOptions fasOptions);
+        Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions, FileSystemAccessOptions fasOptions);
 
-        #endregion
+        Task<TFsFileHandle> ShowSaveFilePickerAsync();
+        Task<TFsFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInFileSystemHandle? saveFilePickerOptions);
+        Task<TFsFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInWellKnownDirectory? saveFilePickerOptions);
+        Task<TFsFileHandle> ShowSaveFilePickerAsync(FileSystemAccessOptions fasOptions);
+        Task<TFsFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInFileSystemHandle? saveFilePickerOptions, FileSystemAccessOptions fasOptions);
+        Task<TFsFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInWellKnownDirectory? saveFilePickerOptions, FileSystemAccessOptions fasOptions);
+    }
+
+    public interface IFileSystemAccessService : IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>
+    {
     }
 }

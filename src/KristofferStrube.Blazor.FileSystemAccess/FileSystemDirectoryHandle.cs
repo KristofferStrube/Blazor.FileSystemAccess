@@ -8,14 +8,13 @@ namespace KristofferStrube.Blazor.FileSystemAccess;
 public class FileSystemDirectoryHandle : FileSystemHandle
 {
 
-    [Obsolete("Use CreateDirectoryHandle from IFileSystemAccessService instead")]
     public static new FileSystemDirectoryHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference)
-        => Create(jSRuntime, jSReference, null);
+        => Create(jSRuntime, jSReference, FileSystemAccessOptions.DefaultInstance);
 
-    internal static new FileSystemDirectoryHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions? options)
+    public static new FileSystemDirectoryHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions options)
         => new(jSRuntime, jSReference, options);
 
-    internal FileSystemDirectoryHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions? options) : base(jSRuntime, jSReference, options) { }
+    internal FileSystemDirectoryHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions options) : base(jSRuntime, jSReference, options) { }
 
     public async Task<FileSystemHandle[]> ValuesAsync()
     {

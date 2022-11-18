@@ -11,17 +11,16 @@ public class FileSystemDirectoryHandleInProcess : FileSystemDirectoryHandle
     public new IJSInProcessObjectReference JSReference;
     protected readonly IJSInProcessObjectReference inProcessHelper;
 
-    [Obsolete("Use CreateDirectoryHandleInProcessAsync from IFileSystemAccessService instead")]
     public static async Task<FileSystemDirectoryHandleInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference)
-        => await CreateAsync(jSRuntime, jSReference, null);
+        => await CreateAsync(jSRuntime, jSReference, FileSystemAccessOptions.DefaultInstance);
 
-    internal static async Task<FileSystemDirectoryHandleInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, FileSystemAccessOptions? options)
+    public static async Task<FileSystemDirectoryHandleInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, FileSystemAccessOptions options)
     {
         IJSInProcessObjectReference inProcessHelper = await jSRuntime.GetInProcessHelperAsync(options);
         return new FileSystemDirectoryHandleInProcess(jSRuntime, inProcessHelper, jSReference, options);
     }
 
-    internal FileSystemDirectoryHandleInProcess(IJSRuntime jSRuntime, IJSInProcessObjectReference inProcessHelper, IJSInProcessObjectReference jSReference, FileSystemAccessOptions? options) : base(jSRuntime, jSReference, options)
+    internal FileSystemDirectoryHandleInProcess(IJSRuntime jSRuntime, IJSInProcessObjectReference inProcessHelper, IJSInProcessObjectReference jSReference, FileSystemAccessOptions options) : base(jSRuntime, jSReference, options)
     {
         this.inProcessHelper = inProcessHelper;
         JSReference = jSReference;
