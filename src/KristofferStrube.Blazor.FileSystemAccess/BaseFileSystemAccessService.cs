@@ -24,7 +24,9 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="openFilePickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions)
-        => await this.InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable());
+    {
+        return await this.InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable());
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
@@ -32,7 +34,9 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="openFilePickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions, FileSystemAccessOptions fsaOptions)
-        => await InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable(), fsaOptions);
+    {
+        return await InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable(), fsaOptions);
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
@@ -40,7 +44,9 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="openFilePickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions)
-        => await this.InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable());
+    {
+        return await this.InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable());
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
@@ -48,29 +54,38 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="openFilePickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions, FileSystemAccessOptions fsaOptions)
-        => await this.InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable(), fsaOptions);
+    {
+        return await this.InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable(), fsaOptions);
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
     /// </summary>
     /// <returns></returns>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync()
-        => await InternalShowOpenFilePickerAsync(null);
+    {
+        return await InternalShowOpenFilePickerAsync(null);
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
     /// </summary>
     /// <returns></returns>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(FileSystemAccessOptions fsaOptions)
-        => await InternalShowOpenFilePickerAsync(null, fsaOptions);
+    {
+        return await InternalShowOpenFilePickerAsync(null, fsaOptions);
+    }
 
     protected async Task<TFsFileHandle[]> InternalShowOpenFilePickerAsync(object? options)
-        => await InternalShowOpenFilePickerAsync(options, FileSystemAccessOptions.DefaultInstance);
+    {
+        return await InternalShowOpenFilePickerAsync(options, FileSystemAccessOptions.DefaultInstance);
+    }
+
     protected async Task<TFsFileHandle[]> InternalShowOpenFilePickerAsync(object? options, FileSystemAccessOptions fsaOptions)
     {
-        var helper = await helperTask.Value;
-        var jSFileHandles = await jSRuntime.InvokeAsync<TObjReference>("window.showOpenFilePicker", options);
-        var length = await helper.InvokeAsync<int>("size", jSFileHandles);
+        IJSObjectReference helper = await helperTask.Value;
+        TObjReference jSFileHandles = await jSRuntime.InvokeAsync<TObjReference>("window.showOpenFilePicker", options);
+        int length = await helper.InvokeAsync<int>("size", jSFileHandles);
 
         return await Task.WhenAll(
             Enumerable
@@ -95,7 +110,9 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="saveFilePickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInWellKnownDirectory? saveFilePickerOptions)
-        => await InternalShowSaveFilePickerAsync(saveFilePickerOptions?.Serializable());
+    {
+        return await InternalShowSaveFilePickerAsync(saveFilePickerOptions?.Serializable());
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showsavefilepicker">showSaveFilePicker() browser specs</see>
@@ -103,7 +120,9 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="saveFilePickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInWellKnownDirectory? saveFilePickerOptions, FileSystemAccessOptions fsaOptions)
-        => await InternalShowSaveFilePickerAsync(saveFilePickerOptions?.Serializable(), fsaOptions);
+    {
+        return await InternalShowSaveFilePickerAsync(saveFilePickerOptions?.Serializable(), fsaOptions);
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showsavefilepicker">showSaveFilePicker() browser specs</see>
@@ -111,7 +130,9 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="saveFilePickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInFileSystemHandle? saveFilePickerOptions)
-        => await InternalShowSaveFilePickerAsync(saveFilePickerOptions?.Serializable());
+    {
+        return await InternalShowSaveFilePickerAsync(saveFilePickerOptions?.Serializable());
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showsavefilepicker">showSaveFilePicker() browser specs</see>
@@ -119,28 +140,36 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="saveFilePickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInFileSystemHandle? saveFilePickerOptions, FileSystemAccessOptions fsaOptions)
-        => await InternalShowSaveFilePickerAsync(saveFilePickerOptions?.Serializable(), fsaOptions);
+    {
+        return await InternalShowSaveFilePickerAsync(saveFilePickerOptions?.Serializable(), fsaOptions);
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showsavefilepicker">showSaveFilePicker() browser specs</see>
     /// </summary>
     /// <returns></returns>
     public async Task<TFsFileHandle> ShowSaveFilePickerAsync()
-        => await InternalShowSaveFilePickerAsync(null);
+    {
+        return await InternalShowSaveFilePickerAsync(null);
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showsavefilepicker">showSaveFilePicker() browser specs</see>
     /// </summary>
     /// <returns></returns>
     public async Task<TFsFileHandle> ShowSaveFilePickerAsync(FileSystemAccessOptions options)
-        => await InternalShowSaveFilePickerAsync(null, options);
+    {
+        return await InternalShowSaveFilePickerAsync(null, options);
+    }
 
     protected async Task<TFsFileHandle> InternalShowSaveFilePickerAsync(object? options)
-        => await this.InternalShowSaveFilePickerAsync(options, FileSystemAccessOptions.DefaultInstance);
+    {
+        return await this.InternalShowSaveFilePickerAsync(options, FileSystemAccessOptions.DefaultInstance);
+    }
 
     protected async Task<TFsFileHandle> InternalShowSaveFilePickerAsync(object? options, FileSystemAccessOptions fsaOptions)
     {
-        var jSFileHandle = await jSRuntime.InvokeAsync<TObjReference>("window.showSaveFilePicker", options);
+        TObjReference jSFileHandle = await jSRuntime.InvokeAsync<TObjReference>("window.showSaveFilePicker", options);
         return await this.CreateFileHandleAsync(jSRuntime, jSFileHandle, fsaOptions);
     }
 
@@ -154,7 +183,9 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="directoryPickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInWellKnownDirectory? directoryPickerOptions)
-        => await InternalShowDirectoryPickerAsync(directoryPickerOptions?.Serializable());
+    {
+        return await InternalShowDirectoryPickerAsync(directoryPickerOptions?.Serializable());
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showdirectorypicker">showDirectoryPicker() browser specs</see>
@@ -162,7 +193,9 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="directoryPickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInWellKnownDirectory? directoryPickerOptions, FileSystemAccessOptions fasOptions)
-        => await InternalShowDirectoryPickerAsync(directoryPickerOptions?.Serializable(), fasOptions);
+    {
+        return await InternalShowDirectoryPickerAsync(directoryPickerOptions?.Serializable(), fasOptions);
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showdirectorypicker">showDirectoryPicker() browser specs</see>
@@ -170,7 +203,9 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="directoryPickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInFileSystemHandle? directoryPickerOptions)
-        => await InternalShowDirectoryPickerAsync(directoryPickerOptions?.Serializable());
+    {
+        return await InternalShowDirectoryPickerAsync(directoryPickerOptions?.Serializable());
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showdirectorypicker">showDirectoryPicker() browser specs</see>
@@ -178,7 +213,9 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="directoryPickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInFileSystemHandle? directoryPickerOptions, FileSystemAccessOptions fasOptions)
-        => await InternalShowDirectoryPickerAsync(directoryPickerOptions?.Serializable(), fasOptions);
+    {
+        return await InternalShowDirectoryPickerAsync(directoryPickerOptions?.Serializable(), fasOptions);
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showdirectorypicker">showDirectoryPicker() browser specs</see>
@@ -186,7 +223,9 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="directoryPickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsDirectoryHandle> ShowDirectoryPickerAsync()
-        => await InternalShowDirectoryPickerAsync(null);
+    {
+        return await InternalShowDirectoryPickerAsync(null);
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showdirectorypicker">showDirectoryPicker() browser specs</see>
@@ -194,14 +233,18 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <param name="directoryPickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(FileSystemAccessOptions fasOptions)
-        => await InternalShowDirectoryPickerAsync(null, fasOptions);
+    {
+        return await InternalShowDirectoryPickerAsync(null, fasOptions);
+    }
 
     protected async Task<TFsDirectoryHandle> InternalShowDirectoryPickerAsync(object? options)
-        => await InternalShowDirectoryPickerAsync(options, FileSystemAccessOptions.DefaultInstance);
+    {
+        return await InternalShowDirectoryPickerAsync(options, FileSystemAccessOptions.DefaultInstance);
+    }
 
     protected async Task<TFsDirectoryHandle> InternalShowDirectoryPickerAsync(object? options, FileSystemAccessOptions fasOptions)
     {
-        var jSFileHandle = await jSRuntime.InvokeAsync<TObjReference>("window.showDirectoryPicker", options);
+        TObjReference jSFileHandle = await jSRuntime.InvokeAsync<TObjReference>("window.showDirectoryPicker", options);
         return await this.CreateDirectoryHandleAsync(jSRuntime, jSFileHandle, fasOptions);
     }
 
@@ -214,7 +257,9 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// </summary>
     /// <returns></returns>
     public async Task<TFsDirectoryHandle> GetOriginPrivateDirectoryAsync()
-        => await this.GetOriginPrivateDirectoryAsync(FileSystemAccessOptions.DefaultInstance);
+    {
+        return await this.GetOriginPrivateDirectoryAsync(FileSystemAccessOptions.DefaultInstance);
+    }
 
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#dom-storagemanager-getdirectory">getDirectory() for StorageManager browser specs</see>
@@ -222,7 +267,7 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <returns></returns>
     public async Task<TFsDirectoryHandle> GetOriginPrivateDirectoryAsync(FileSystemAccessOptions fasOptions)
     {
-        var jSFileHandle = await jSRuntime.InvokeAsync<TObjReference>("navigator.storage.getDirectory");
+        TObjReference jSFileHandle = await jSRuntime.InvokeAsync<TObjReference>("navigator.storage.getDirectory");
         return await CreateDirectoryHandleAsync(jSRuntime, jSFileHandle, fasOptions);
     }
 

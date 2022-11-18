@@ -13,7 +13,9 @@ public class FileSystemFileHandleInProcess : FileSystemFileHandle
     protected readonly IJSInProcessObjectReference inProcessHelper;
 
     public static async Task<FileSystemFileHandleInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference)
-        => await CreateAsync(jSRuntime, jSReference, FileSystemAccessOptions.DefaultInstance);
+    {
+        return await CreateAsync(jSRuntime, jSReference, FileSystemAccessOptions.DefaultInstance);
+    }
 
     public static async Task<FileSystemFileHandleInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, FileSystemAccessOptions options)
     {

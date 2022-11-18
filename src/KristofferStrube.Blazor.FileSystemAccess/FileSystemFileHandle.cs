@@ -9,10 +9,14 @@ public class FileSystemFileHandle : FileSystemHandle
 {
 
     public static new FileSystemFileHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference)
-        => Create(jSRuntime, jSReference, FileSystemAccessOptions.DefaultInstance);
+    {
+        return Create(jSRuntime, jSReference, FileSystemAccessOptions.DefaultInstance);
+    }
 
-    public static new FileSystemFileHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions options) 
-        => new(jSRuntime, jSReference, options);
+    public static new FileSystemFileHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions options)
+    {
+        return new(jSRuntime, jSReference, options);
+    }
 
     internal FileSystemFileHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions options) : base(jSRuntime, jSReference, options) { }
 

@@ -2,7 +2,7 @@ using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
-public class FileSystemAccessService : 
+public class FileSystemAccessService :
     BaseFileSystemAccessService<
         FileSystemFileHandle,
         FileSystemDirectoryHandle,
@@ -14,8 +14,12 @@ public class FileSystemAccessService :
     }
 
     protected override Task<FileSystemDirectoryHandle> CreateDirectoryHandleAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions options)
-        => Task.FromResult(new FileSystemDirectoryHandle(jSRuntime, jSReference, options));
+    {
+        return Task.FromResult(new FileSystemDirectoryHandle(jSRuntime, jSReference, options));
+    }
 
     protected override Task<FileSystemFileHandle> CreateFileHandleAsync(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions options)
-        => Task.FromResult(new FileSystemFileHandle(jSRuntime, jSReference, options));
+    {
+        return Task.FromResult(new FileSystemFileHandle(jSRuntime, jSReference, options));
+    }
 }

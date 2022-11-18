@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.JSInterop;
-using System.Diagnostics;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
@@ -31,12 +29,12 @@ public static class IServiceCollectionExtensions
             .AddScoped<IFileSystemAccessServiceInProcess, FileSystemAccessServiceInProcess>()
             .AddScoped(sp =>
             {
-                var service = sp.GetRequiredService<IFileSystemAccessServiceInProcess>();
+                IFileSystemAccessServiceInProcess service = sp.GetRequiredService<IFileSystemAccessServiceInProcess>();
                 return (IFileSystemAccessService)service;
             });
     }
 
-    static void ConfigureFsaOptions(IServiceCollection services, Action<FileSystemAccessOptions>? configure)
+    private static void ConfigureFsaOptions(IServiceCollection services, Action<FileSystemAccessOptions>? configure)
     {
         if (configure is null) { return; }
 

@@ -12,7 +12,9 @@ public class FileSystemDirectoryHandleInProcess : FileSystemDirectoryHandle
     protected readonly IJSInProcessObjectReference inProcessHelper;
 
     public static async Task<FileSystemDirectoryHandleInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference)
-        => await CreateAsync(jSRuntime, jSReference, FileSystemAccessOptions.DefaultInstance);
+    {
+        return await CreateAsync(jSRuntime, jSReference, FileSystemAccessOptions.DefaultInstance);
+    }
 
     public static async Task<FileSystemDirectoryHandleInProcess> CreateAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, FileSystemAccessOptions options)
     {

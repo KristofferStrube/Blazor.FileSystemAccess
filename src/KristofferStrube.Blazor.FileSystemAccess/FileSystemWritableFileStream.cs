@@ -1,4 +1,5 @@
 ﻿using KristofferStrube.Blazor.FileAPI;
+using KristofferStrube.Blazor.FileSystemAccess.Extensions;
 using KristofferStrube.Blazor.Streams;
 using Microsoft.JSInterop;
 
@@ -12,6 +13,11 @@ public class FileSystemWritableFileStream : WritableStream
     public override bool CanSeek => true;
 
     public override long Position { get; set; }
+
+    public static new FileSystemWritableFileStream Create(IJSRuntime jSRuntime, IJSObjectReference jSReference)
+    {
+        return new FileSystemWritableFileStream(jSRuntime, jSReference);
+    }
 
     internal FileSystemWritableFileStream(IJSRuntime jSRuntime, IJSObjectReference jSReference) : base(jSRuntime, jSReference) { }
 

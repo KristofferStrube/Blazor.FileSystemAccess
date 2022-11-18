@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added `FileSystemAccessOptions` class that can customize the helper script path. By [@datvm](https://github.com/datvm).
+- Added overloads for `FileSystemAccessService` and `FileSystemAccessServiceInProcess` methods that takes a `FileSystemAccessOptions`. By [@datvm](https://github.com/datvm).
+- Added overloads for creator methods on `FileSystemHandle`, `FileSystemFileHandle`, and `FileSystemDirectoryHandle`  that takes a `FileSystemAccessOptions`. By [@datvm](https://github.com/datvm).
+- Added `Create` method to `FileSystemWritableFileStream`.
 
 ## [2.0.0] - 2022-11-10
 ### Added

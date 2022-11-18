@@ -9,10 +9,14 @@ public class FileSystemHandle : BaseJSWrapper
 {
 
     public static FileSystemHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference)
-        => Create(jSRuntime, jSReference, FileSystemAccessOptions.DefaultInstance);
+    {
+        return Create(jSRuntime, jSReference, FileSystemAccessOptions.DefaultInstance);
+    }
 
     public static FileSystemHandle Create(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions options)
-        => new(jSRuntime, jSReference, options);
+    {
+        return new(jSRuntime, jSReference, options);
+    }
 
     internal FileSystemHandle(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions options) : base(jSRuntime, jSReference, options) { }
 
