@@ -1,6 +1,5 @@
 ﻿using KristofferStrube.Blazor.FileAPI;
 using KristofferStrube.Blazor.FileSystemAccess.Extensions;
-using KristofferStrube.Blazor.FileSystemAccess.Options;
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;

@@ -1,4 +1,3 @@
-using KristofferStrube.Blazor.FileSystemAccess.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
 

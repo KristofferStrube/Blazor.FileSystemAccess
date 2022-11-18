@@ -1,6 +1,5 @@
 using KristofferStrube.Blazor.FileAPI;
 using KristofferStrube.Blazor.FileSystemAccess;
-using KristofferStrube.Blazor.FileSystemAccess.Options;
 using KristofferStrube.Blazor.FileSystemAccess.WasmExample;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;

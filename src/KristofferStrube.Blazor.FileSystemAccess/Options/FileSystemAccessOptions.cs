@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace KristofferStrube.Blazor.FileSystemAccess.Options;
+namespace KristofferStrube.Blazor.FileSystemAccess;
 
 public class FileSystemAccessOptions
 {
