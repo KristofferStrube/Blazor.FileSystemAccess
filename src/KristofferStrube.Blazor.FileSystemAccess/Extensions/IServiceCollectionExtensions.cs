@@ -28,12 +28,12 @@ public static class IServiceCollectionExtensions
         ConfigureFsaOptions(serviceCollection, configure);
 
         return serviceCollection
-            .AddScoped<IFileSystemAccessServiceInProcess, FileSystemAccessServiceInProcess>();
-            //.AddScoped(sp =>
-            //{
-            //    var service = sp.GetRequiredService<IFileSystemAccessServiceInProcess>();
-            //    return (IFileSystemAccessService)service;
-            //});
+            .AddScoped<IFileSystemAccessServiceInProcess, FileSystemAccessServiceInProcess>()
+            .AddScoped(sp =>
+            {
+                var service = sp.GetRequiredService<IFileSystemAccessServiceInProcess>();
+                return (IFileSystemAccessService)service;
+            });
     }
 
     static void ConfigureFsaOptions(IServiceCollection services, Action<FileSystemAccessOptions>? configure)
