@@ -101,6 +101,10 @@ Feel free to open issues on the repository if you find any errors with the packa
 
 A known issue is that using Streams to stream large amount of data in Blazor Server is not supported.
 
+# Related repositories
+This project uses the *Blazor.FileSystem* package to return rich `FileSystemHandle`s both `FileSystemFileHande`s and `FileSystemDirectoryHandle`s.
+- https://github.com/KristofferStrube/Blazor.FileSystem
+
 # Related articles
 This repository was build with inspiration and help from the following series of articles:
 

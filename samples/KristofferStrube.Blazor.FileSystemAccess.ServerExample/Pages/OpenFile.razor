@@ -18,11 +18,11 @@ else if (fileText is null)
 else if (writePermissionState is PermissionState.Denied or PermissionState.Prompt)
 {
     <button @onclick="RequestWriteAccess" class="btn btn-primary">Request Write Access for @fileHandleName</button>
-    <textarea style="width:100%;height:calc(100% - 44px);" value=@fileText @oninput=TextAreaChanged disabled="disabled"></textarea>
+    <textarea style="width:100%;height:calc(100vh - 144px);" value=@fileText @oninput=TextAreaChanged disabled="disabled"></textarea>
 }
 else
 {
-    <textarea style="width:100%;height:calc(100% - 6px);" value=@fileText @oninput=TextAreaChanged></textarea>
+    <textarea style="width:100%;height:calc(100vh - 106px);" value=@fileText @oninput=TextAreaChanged></textarea>
 }
 
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using KristofferStrube.Blazor.FileSystem;
+using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess
 {
@@ -9,7 +10,6 @@ namespace KristofferStrube.Blazor.FileSystemAccess
             IJSInProcessObjectReference
         >
     {
-        new Task<FileSystemDirectoryHandleInProcess> GetOriginPrivateDirectoryAsync();
         new Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerAsync();
         new Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInFileSystemHandle? directoryPickerOptions);
         new Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInWellKnownDirectory? directoryPickerOptions);
