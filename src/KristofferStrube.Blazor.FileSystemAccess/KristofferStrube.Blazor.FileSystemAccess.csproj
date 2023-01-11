@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="KristofferStrube.Blazor.FileAPI" Version="0.2.0" />
+    <PackageReference Include="KristofferStrube.Blazor.FileSystem" Version="0.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.*" />
   </ItemGroup>
 

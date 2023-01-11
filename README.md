@@ -2,7 +2,6 @@
 [![GitHub issues](https://img.shields.io/github/issues/KristofferStrube/Blazor.FileSystemAccess)](https://github.com/KristofferStrube/Blazor.FileSystemAccess/issues)
 [![GitHub forks](https://img.shields.io/github/forks/KristofferStrube/Blazor.FileSystemAccess)](https://github.com/KristofferStrube/Blazor.FileSystemAccess/network/members)
 [![GitHub stars](https://img.shields.io/github/stars/KristofferStrube/Blazor.FileSystemAccess)](https://github.com/KristofferStrube/Blazor.FileSystemAccess/stargazers)
-
 [![NuGet Downloads (official NuGet)](https://img.shields.io/nuget/dt/KristofferStrube.Blazor.FileSystemAccess?label=NuGet%20Downloads)](https://www.nuget.org/packages/KristofferStrube.Blazor.FileSystemAccess/)  
 
 # Introduction
@@ -18,6 +17,8 @@ The sample project can be demoed at https://kristofferstrube.github.io/Blazor.Fi
 On each page you can find the corresponding code for the example in the top right corner.
 
 On the main page you can see if the API has at least minimal support in the used browser.
+
+On the [Status page](https://kristofferstrube.github.io/Blazor.FileSystemAccess/Status) you can see how much of the WebIDL specs this wrapper has covered.
 
 # Getting Started
 ## Prerequisites
@@ -100,6 +101,10 @@ Then you can use `IFileSystemAccessService` to open one of the three dialogs ava
 Feel free to open issues on the repository if you find any errors with the package or have wishes for features.
 
 A known issue is that using Streams to stream large amount of data in Blazor Server is not supported.
+
+# Related repositories
+This project uses the *Blazor.FileSystem* package to return rich `FileSystemHandle`s both `FileSystemFileHande`s and `FileSystemDirectoryHandle`s.
+- https://github.com/KristofferStrube/Blazor.FileSystem
 
 # Related articles
 This repository was build with inspiration and help from the following series of articles:

@@ -11,7 +11,7 @@
 {
     <pre><code>
             @((MarkupString)compareText)
-            </code></pre>
+        </code></pre>
 }
 else
 {
@@ -25,7 +25,7 @@ else
     {
         if (firstRender)
         {
-            var domString = await HttpClient.GetStringAsync("https://wicg.github.io/file-system-access/");
+            var domString = await HttpClient.GetStringAsync("https://wicg.github.io/file-system-access/#idl-index");
 
             var dom = new HtmlDocument();
             dom.LoadHtml(domString);
@@ -40,35 +40,31 @@ else
             var supportedIndex = 0;
             while (fetchedIndex < fetchedLines.Length || supportedIndex < supportedLines.Length)
             {
+                var color = "pink";
                 if (fetchedIndex == fetchedLines.Length)
                 {
-                    compareLines.Add($"""<span style="background-color:blue;">{supportedLines[supportedIndex]}</span>""");
+                    color = "cyan";
                     supportedIndex++;
+                    fetchedIndex--;
                 }
                 else if (supportedIndex == supportedLines.Length)
                 {
-                    compareLines.Add($"""<span style="background-color:orange;">{fetchedLines[fetchedIndex]}</span>""");
-                    fetchedIndex++;
+                    color = "lemonchiffon";
                 }
                 else if (fetchedLines[fetchedIndex].Trim() == supportedLines[supportedIndex].Trim())
                 {
-                    compareLines.Add($"""<span style="background-color:lightgreen;">{fetchedLines[fetchedIndex]}</span>""");
-                    fetchedIndex++;
+                    color = "lightgreen";
                     supportedIndex++;
                 }
-                else
-                {
-                    compareLines.Add($"""<span style="background-color:pink;">{fetchedLines[fetchedIndex]}</span>""");
-                    fetchedIndex++;
-                }
+                compareLines.Add($"""<span style="background-color:{color};display:block;min-height:21px;">{fetchedLines[fetchedIndex++]}</span>""");
             }
-            compareText = string.Join("\n", compareLines);
+            compareText = string.Join("", compareLines);
             StateHasChanged();
         }
     }
 
     private const string currentlySupportedWebIDL =
-        @"enum FileSystemPermissionMode {
+                @"enum FileSystemPermissionMode {
     ""read"",
     ""readwrite""
 };
@@ -82,76 +78,10 @@ dictionary FileSystemHandlePermissionDescriptor {
     FileSystemPermissionMode mode = ""read"";
 };
 
-enum FileSystemHandleKind {
-    ""file"",
-    ""directory"",
-};
-
 [Exposed=(Window,Worker), SecureContext, Serializable]
-interface FileSystemHandle {
-    readonly attribute FileSystemHandleKind kind;
-    readonly attribute USVString name;
-
-    Promise<boolean> isSameEntry(FileSystemHandle other);
-
+partial interface FileSystemHandle {
     Promise<PermissionState> queryPermission(optional FileSystemHandlePermissionDescriptor descriptor = {});
     Promise<PermissionState> requestPermission(optional FileSystemHandlePermissionDescriptor descriptor = {});
-};
-
-dictionary FileSystemCreateWritableOptions {
-    boolean keepExistingData = false;
-};
-
-[Exposed=(Window,Worker), SecureContext, Serializable]
-interface FileSystemFileHandle : FileSystemHandle {
-    Promise<File> getFile();
-    Promise<FileSystemWritableFileStream> createWritable(optional FileSystemCreateWritableOptions options = {});
-};
-
-dictionary FileSystemGetFileOptions {
-    boolean create = false;
-};
-
-dictionary FileSystemGetDirectoryOptions {
-    boolean create = false;
-};
-
-dictionary FileSystemRemoveOptions {
-    boolean recursive = false;
-};
-
-[Exposed=(Window,Worker), SecureContext, Serializable]
-interface FileSystemDirectoryHandle : FileSystemHandle {
-    async iterable<USVString, FileSystemHandle>;
-
-    Promise<FileSystemFileHandle> getFileHandle(USVString name, optional FileSystemGetFileOptions options = {});
-    Promise<FileSystemDirectoryHandle> getDirectoryHandle(USVString name, optional FileSystemGetDirectoryOptions options = {});
-
-    Promise<undefined> removeEntry(USVString name, optional FileSystemRemoveOptions options = {});
-
-    Promise<sequence<USVString>?> resolve(FileSystemHandle possibleDescendant);
-};
-
-enum WriteCommandType {
-    ""write"",
-    ""seek"",
-    ""truncate"",
-};
-
-dictionary WriteParams {
-    required WriteCommandType type;
-    unsigned long long? size;
-    unsigned long long? position;
-    (BufferSource or Blob or USVString)? data;
-};
-
-typedef (BufferSource or Blob or USVString or WriteParams) FileSystemWriteChunkType;
-
-[Exposed=(Window,Worker), SecureContext]
-interface FileSystemWritableFileStream : WritableStream {
-    Promise<undefined> write(FileSystemWriteChunkType data);
-    Promise<undefined> seek(unsigned long long position);
-    Promise<undefined> truncate(unsigned long long size);
 };
 
 enum WellKnownDirectory {
@@ -196,11 +126,6 @@ partial interface Window {
     Promise<sequence<FileSystemFileHandle>> showOpenFilePicker(optional OpenFilePickerOptions options = {});
     Promise<FileSystemFileHandle> showSaveFilePicker(optional SaveFilePickerOptions options = {});
     Promise<FileSystemDirectoryHandle> showDirectoryPicker(optional DirectoryPickerOptions options = {});
-};
-
-[SecureContext]
-partial interface StorageManager {
-    Promise<FileSystemDirectoryHandle> getDirectory();
 };";
 
 }

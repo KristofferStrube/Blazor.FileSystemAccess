@@ -1,4 +1,5 @@
 using KristofferStrube.Blazor.FileAPI;
+using KristofferStrube.Blazor.FileSystem;
 using KristofferStrube.Blazor.FileSystemAccess;
 using KristofferStrube.Blazor.FileSystemAccess.WasmExample;
 using Microsoft.AspNetCore.Components.Web;
@@ -18,6 +19,7 @@ builder.Services.AddFileSystemAccessServiceInProcess(options =>
     // options.BasePath = "content/";
     // options.ScriptPath = $"custom-path/{FileSystemAccessOptions.DefaultNamespace}.js";
 });
+builder.Services.AddStorageManagerService();
 
 builder.Services.AddURLServiceInProcess();
 
