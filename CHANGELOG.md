@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.0.0] - 2023-01-11
 ### Changed
-- Changed to use `FileSystemHandle`, `FileSystemFileHandle`, and `FileSystemDirectoryHandle` and their InProcess variants from `Blazor.FileSystem`.
+- Changed to use `FileSystemHandle`, `FileSystemFileHandle`, `FileSystemDirectoryHandle`, and their InProcess variants from `Blazor.FileSystem`.
 
 ## [2.1.0] - 2022-11-18
 ### Added
