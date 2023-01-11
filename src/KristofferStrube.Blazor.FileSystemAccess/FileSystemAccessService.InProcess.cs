@@ -1,3 +1,4 @@
+using KristofferStrube.Blazor.FileSystem;
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
@@ -13,19 +14,14 @@ public class FileSystemAccessServiceInProcess :
     {
     }
 
-    protected override async Task<FileSystemDirectoryHandleInProcess> CreateDirectoryHandleAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, FileSystemAccessOptions options)
+    protected override async Task<FileSystemDirectoryHandleInProcess> CreateDirectoryHandleAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, FileSystemOptions options)
     {
         return await FileSystemDirectoryHandleInProcess.CreateAsync(jSRuntime, jSReference, options);
     }
 
-    protected override async Task<FileSystemFileHandleInProcess> CreateFileHandleAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, FileSystemAccessOptions options)
+    protected override async Task<FileSystemFileHandleInProcess> CreateFileHandleAsync(IJSRuntime jSRuntime, IJSInProcessObjectReference jSReference, FileSystemOptions options)
     {
         return await FileSystemFileHandleInProcess.CreateAsync(jSRuntime, jSReference, options);
-    }
-
-    async Task<FileSystemDirectoryHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.GetOriginPrivateDirectoryAsync()
-    {
-        return await this.GetOriginPrivateDirectoryAsync();
     }
 
     async Task<FileSystemDirectoryHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowDirectoryPickerAsync()
@@ -43,19 +39,19 @@ public class FileSystemAccessServiceInProcess :
         return await this.ShowDirectoryPickerAsync(directoryPickerOptions);
     }
 
-    async Task<FileSystemDirectoryHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowDirectoryPickerAsync(FileSystemAccessOptions fasOptions)
+    async Task<FileSystemDirectoryHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowDirectoryPickerAsync(FileSystemOptions fsOptions)
     {
-        return await this.ShowDirectoryPickerAsync(fasOptions);
+        return await this.ShowDirectoryPickerAsync(fsOptions);
     }
 
-    async Task<FileSystemDirectoryHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInFileSystemHandle? directoryPickerOptions, FileSystemAccessOptions fasOptions)
+    async Task<FileSystemDirectoryHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInFileSystemHandle? directoryPickerOptions, FileSystemOptions fsOptions)
     {
-        return await this.ShowDirectoryPickerAsync(directoryPickerOptions, fasOptions);
+        return await this.ShowDirectoryPickerAsync(directoryPickerOptions, fsOptions);
     }
 
-    async Task<FileSystemDirectoryHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInWellKnownDirectory? directoryPickerOptions, FileSystemAccessOptions fasOptions)
+    async Task<FileSystemDirectoryHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInWellKnownDirectory? directoryPickerOptions, FileSystemOptions fsOptions)
     {
-        return await this.ShowDirectoryPickerAsync(directoryPickerOptions, fasOptions);
+        return await this.ShowDirectoryPickerAsync(directoryPickerOptions, fsOptions);
     }
 
     async Task<FileSystemFileHandle[]> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowOpenFilePickerAsync()
@@ -73,19 +69,19 @@ public class FileSystemAccessServiceInProcess :
         return await this.ShowOpenFilePickerAsync(openFilePickerOptions);
     }
 
-    async Task<FileSystemFileHandle[]> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowOpenFilePickerAsync(FileSystemAccessOptions fasOptions)
+    async Task<FileSystemFileHandle[]> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowOpenFilePickerAsync(FileSystemOptions fsOptions)
     {
-        return await this.ShowOpenFilePickerAsync(fasOptions);
+        return await this.ShowOpenFilePickerAsync(fsOptions);
     }
 
-    async Task<FileSystemFileHandle[]> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions, FileSystemAccessOptions fasOptions)
+    async Task<FileSystemFileHandle[]> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions, FileSystemOptions fsOptions)
     {
-        return await this.ShowOpenFilePickerAsync(openFilePickerOptions, fasOptions);
+        return await this.ShowOpenFilePickerAsync(openFilePickerOptions, fsOptions);
     }
 
-    async Task<FileSystemFileHandle[]> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions, FileSystemAccessOptions fasOptions)
+    async Task<FileSystemFileHandle[]> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions, FileSystemOptions fsOptions)
     {
-        return await this.ShowOpenFilePickerAsync(openFilePickerOptions, fasOptions);
+        return await this.ShowOpenFilePickerAsync(openFilePickerOptions, fsOptions);
     }
 
     async Task<FileSystemFileHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowSaveFilePickerAsync()
@@ -103,18 +99,18 @@ public class FileSystemAccessServiceInProcess :
         return await this.ShowSaveFilePickerAsync(saveFilePickerOptions);
     }
 
-    async Task<FileSystemFileHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowSaveFilePickerAsync(FileSystemAccessOptions fasOptions)
+    async Task<FileSystemFileHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowSaveFilePickerAsync(FileSystemOptions fsOptions)
     {
-        return await this.ShowSaveFilePickerAsync(fasOptions);
+        return await this.ShowSaveFilePickerAsync(fsOptions);
     }
 
-    async Task<FileSystemFileHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInFileSystemHandle? saveFilePickerOptions, FileSystemAccessOptions fasOptions)
+    async Task<FileSystemFileHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInFileSystemHandle? saveFilePickerOptions, FileSystemOptions fsOptions)
     {
-        return await this.ShowSaveFilePickerAsync(saveFilePickerOptions, fasOptions);
+        return await this.ShowSaveFilePickerAsync(saveFilePickerOptions, fsOptions);
     }
 
-    async Task<FileSystemFileHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInWellKnownDirectory? saveFilePickerOptions, FileSystemAccessOptions fasOptions)
+    async Task<FileSystemFileHandle> IFileSystemAccessService<FileSystemFileHandle, FileSystemDirectoryHandle, IJSObjectReference>.ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInWellKnownDirectory? saveFilePickerOptions, FileSystemOptions fsOptions)
     {
-        return await this.ShowSaveFilePickerAsync(saveFilePickerOptions, fasOptions);
+        return await this.ShowSaveFilePickerAsync(saveFilePickerOptions, fsOptions);
     }
 }
