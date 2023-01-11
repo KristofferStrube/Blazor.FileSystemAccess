@@ -19,6 +19,8 @@ On each page you can find the corresponding code for the example in the top righ
 
 On the main page you can see if the API has at least minimal support in the used browser.
 
+On the [Status page](https://kristofferstrube.github.io/Blazor.FileSystemAccess/Status) you can see how much of the WebIDL specs this wrapper has covered.
+
 # Getting Started
 ## Prerequisites
 You need to install .NET 6.0 or newer to use the library.
