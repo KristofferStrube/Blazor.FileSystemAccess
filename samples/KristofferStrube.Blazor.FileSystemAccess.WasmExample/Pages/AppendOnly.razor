@@ -58,14 +58,11 @@ else
         if (!eventArgs.Repeat && fileHandle is not null && eventArgs.Key is { Length: 1 } key && allowedChars.Contains(char.Parse(key)))
         {
             var file = await fileHandle.GetFileAsync();
-            var writable = await fileHandle.CreateWritableAsync();
-            if (fileText is not null)
+            await using (var writable = await fileHandle.CreateWritableAsync(new() { KeepExistingData = true }))
             {
-                await writable.WriteAsync(fileText);
+                await writable.SeekAsync((ulong)cursorPosition);
+                await writable.WriteAsync(key);
             }
-            await writable.SeekAsync((ulong)cursorPosition);
-            await writable.WriteAsync(key);
-            await writable.CloseAsync();
             file = await fileHandle.GetFileAsync();
             fileText = await file.TextAsync();
             keyInput = key;
