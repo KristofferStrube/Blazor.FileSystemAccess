@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2023-02-15
+### Changed
+- Changed the version of `Blazor.FileSystem` to use the newest version which is `0.2.0`.
+
 ## [3.0.0] - 2023-01-11
 ### Changed
 - Changed to use `FileSystemHandle`, `FileSystemFileHandle`, `FileSystemDirectoryHandle`, and their InProcess variants from `Blazor.FileSystem`.

@@ -66,7 +66,7 @@ else
         var values = await directoryHandle.ValuesAsync();
         entitiesChecked = 0;
         StateHasChanged();
-        var queue = new Queue<(Entity entity, FileSystemDirectoryHandle dir, FileSystemHandle value)>();
+        var queue = new Queue<(Entity entity, FileSystemDirectoryHandle dir, IFileSystemHandle value)>();
         for (int i = 0; i < values.Count(); i++)
         {
             var value = values[i];
@@ -102,7 +102,7 @@ else
 
     protected class Entity
     {
-        public Entity(FileSystemHandleKind Kind, FileSystemHandle? Handle, int ColorIndex)
+        public Entity(FileSystemHandleKind Kind, IFileSystemHandle? Handle, int ColorIndex)
         {
             this.Kind = Kind;
             this.Handle = Handle;
@@ -110,7 +110,7 @@ else
             Children = new();
         }
         public FileSystemHandleKind Kind { get; set; }
-        public FileSystemHandle? Handle { get; set; }
+        public IFileSystemHandle? Handle { get; set; }
         public ulong Size { get; set; }
         public List<Entity> Children { get; set; }
         public int ColorIndex { get; set; }

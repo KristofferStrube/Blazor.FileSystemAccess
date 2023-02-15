@@ -11,7 +11,7 @@
     <RepositoryUrl>https://github.com/KristofferStrube/Blazor.FileSystemAccess</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageVersion>3.0.0</PackageVersion>
+    <PackageVersion>3.1.0</PackageVersion>
     <Authors>Kristoffer Strube</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="KristofferStrube.Blazor.FileSystem" Version="0.1.0" />
+    <PackageReference Include="KristofferStrube.Blazor.FileSystem" Version="0.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.*" />
   </ItemGroup>
 
