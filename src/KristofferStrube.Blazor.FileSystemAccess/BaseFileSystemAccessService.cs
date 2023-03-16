@@ -33,6 +33,7 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
     /// </summary>
     /// <param name="openFilePickerOptions"></param>
+    /// <param name="fsOptions"></param>
     /// <returns></returns>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions, FileSystemOptions fsOptions)
     {
@@ -53,6 +54,7 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
     /// </summary>
     /// <param name="openFilePickerOptions"></param>
+    /// <param name="fsOptions"></param>
     /// <returns></returns>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions, FileSystemOptions fsOptions)
     {
@@ -119,6 +121,7 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <see href="https://wicg.github.io/file-system-access/#api-showsavefilepicker">showSaveFilePicker() browser specs</see>
     /// </summary>
     /// <param name="saveFilePickerOptions"></param>
+    /// <param name="fsOptions"></param>
     /// <returns></returns>
     public async Task<TFsFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInWellKnownDirectory? saveFilePickerOptions, FileSystemOptions fsOptions)
     {
@@ -139,6 +142,7 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <see href="https://wicg.github.io/file-system-access/#api-showsavefilepicker">showSaveFilePicker() browser specs</see>
     /// </summary>
     /// <param name="saveFilePickerOptions"></param>
+    /// <param name="fsOptions"></param>
     /// <returns></returns>
     public async Task<TFsFileHandle> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInFileSystemHandle? saveFilePickerOptions, FileSystemOptions fsOptions)
     {
@@ -192,6 +196,7 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <see href="https://wicg.github.io/file-system-access/#api-showdirectorypicker">showDirectoryPicker() browser specs</see>
     /// </summary>
     /// <param name="directoryPickerOptions"></param>
+    /// <param name="fsOptions"></param>
     /// <returns></returns>
     public async Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInWellKnownDirectory? directoryPickerOptions, FileSystemOptions fsOptions)
     {
@@ -212,6 +217,7 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <see href="https://wicg.github.io/file-system-access/#api-showdirectorypicker">showDirectoryPicker() browser specs</see>
     /// </summary>
     /// <param name="directoryPickerOptions"></param>
+    /// <param name="fsOptions"></param>
     /// <returns></returns>
     public async Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInFileSystemHandle? directoryPickerOptions, FileSystemOptions fsOptions)
     {
@@ -221,7 +227,6 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showdirectorypicker">showDirectoryPicker() browser specs</see>
     /// </summary>
-    /// <param name="directoryPickerOptions"></param>
     /// <returns></returns>
     public async Task<TFsDirectoryHandle> ShowDirectoryPickerAsync()
     {
@@ -231,7 +236,7 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <summary>
     /// <see href="https://wicg.github.io/file-system-access/#api-showdirectorypicker">showDirectoryPicker() browser specs</see>
     /// </summary>
-    /// <param name="directoryPickerOptions"></param>
+    /// <param name="fsOptions"></param>
     /// <returns></returns>
     public async Task<TFsDirectoryHandle> ShowDirectoryPickerAsync(FileSystemOptions fsOptions)
     {

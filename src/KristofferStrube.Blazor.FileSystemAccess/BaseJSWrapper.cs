@@ -15,6 +15,7 @@ public abstract class BaseJSWrapper : IAsyncDisposable
     /// </summary>
     /// <param name="jSRuntime">An <see cref="IJSRuntime"/> instance.</param>
     /// <param name="jSReference">A JS reference to an existing JS instance that should be wrapped.</param>
+    /// <param name="options"></param>
     internal BaseJSWrapper(IJSRuntime jSRuntime, IJSObjectReference jSReference, FileSystemAccessOptions options)
     {
         this.options = options;
