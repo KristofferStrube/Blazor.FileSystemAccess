@@ -1,4 +1,5 @@
 using KristofferStrube.Blazor.FileSystem;
+using KristofferStrube.Blazor.WebIDL;
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
@@ -10,7 +11,7 @@ public class FileSystemAccessService :
         IJSObjectReference>,
     IFileSystemAccessService
 {
-    public FileSystemAccessService(IJSRuntime jSRuntime) : base(jSRuntime)
+    public FileSystemAccessService(IErrorHandlingJSRuntime errorHandlingJSRuntime, IJSRuntime jSRuntime) : base(errorHandlingJSRuntime, jSRuntime)
     {
     }
 

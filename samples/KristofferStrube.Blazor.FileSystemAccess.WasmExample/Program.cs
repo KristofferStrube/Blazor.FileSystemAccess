@@ -2,6 +2,7 @@ using KristofferStrube.Blazor.FileAPI;
 using KristofferStrube.Blazor.FileSystem;
 using KristofferStrube.Blazor.FileSystemAccess;
 using KristofferStrube.Blazor.FileSystemAccess.WasmExample;
+using KristofferStrube.Blazor.WebIDL;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using TG.Blazor.IndexedDB;
@@ -35,4 +36,8 @@ builder.Services.AddIndexedDB(dbStore =>
     });
 });
 
-await builder.Build().RunAsync();
+var app = builder.Build();
+
+await app.Services.SetupErrorHandlingJSInterop();
+
+await app.RunAsync();
