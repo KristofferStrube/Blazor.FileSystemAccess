@@ -11,7 +11,7 @@ public class FileSystemAccessServiceInProcess :
         IJSInProcessObjectReference>,
     IFileSystemAccessServiceInProcess, IFileSystemAccessService
 {
-    public FileSystemAccessServiceInProcess(IErrorHandlingJSRuntime errorHandlingJSRuntime, IJSRuntime jSRuntime) : base(errorHandlingJSRuntime, jSRuntime)
+    public FileSystemAccessServiceInProcess(IJSRuntime jSRuntime) : base(jSRuntime)
     {
     }
 

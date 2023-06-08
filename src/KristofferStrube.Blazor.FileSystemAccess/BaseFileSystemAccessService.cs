@@ -11,72 +11,52 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
 {
     protected readonly Lazy<Task<IJSObjectReference>> helperTask;
     protected readonly IJSRuntime jSRuntime;
-    protected readonly IErrorHandlingJSRuntime errorHandlingJSRuntime;
+    protected readonly IErrorHandlingJSRuntime? errorHandlingJSRuntime;
 
-    public BaseFileSystemAccessService(IErrorHandlingJSRuntime errorHandlingJSRuntime, IJSRuntime jSRuntime)
+    public BaseFileSystemAccessService(IJSRuntime jSRuntime)
     {
         helperTask = new(() => jSRuntime.GetHelperAsync(FileSystemAccessOptions.DefaultInstance));
-        this.errorHandlingJSRuntime = errorHandlingJSRuntime;
+
+        if (ErrorHandlingJSInterop.ErrorHandlingJSInteropHasBeenSetup)
+        {
+            errorHandlingJSRuntime = new ErrorHandlingJSRuntime();
+        }
         this.jSRuntime = jSRuntime;
     }
 
     #region ShowOpenFilePickerAsync
 
-    /// <summary>
-    /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
-    /// </summary>
-    /// <param name="openFilePickerOptions"></param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions)
     {
         return await this.InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable());
     }
 
-    /// <summary>
-    /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
-    /// </summary>
-    /// <param name="openFilePickerOptions"></param>
-    /// <param name="fsOptions"></param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions, FileSystemOptions fsOptions)
     {
         return await InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable(), fsOptions);
     }
 
-    /// <summary>
-    /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
-    /// </summary>
-    /// <param name="openFilePickerOptions"></param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions)
     {
         return await this.InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable());
     }
 
-    /// <summary>
-    /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
-    /// </summary>
-    /// <param name="openFilePickerOptions"></param>
-    /// <param name="fsOptions"></param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions, FileSystemOptions fsOptions)
     {
         return await this.InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable(), fsOptions);
     }
 
-    /// <summary>
-    /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync()
     {
         return await InternalShowOpenFilePickerAsync(null);
     }
 
-    /// <summary>
-    /// <see href="https://wicg.github.io/file-system-access/#api-showopenfilepicker">showOpenFilePicker() browser specs</see>
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(FileSystemOptions fsOptions)
     {
         return await InternalShowOpenFilePickerAsync(null, fsOptions);
@@ -90,16 +70,16 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     protected async Task<TFsFileHandle[]> InternalShowOpenFilePickerAsync(object? options, FileSystemOptions fsOptions)
     {
         IJSObjectReference helper = await helperTask.Value;
-        IErrorHandlingJSObjectReference jSFileHandles = await errorHandlingJSRuntime.InvokeAsync<IErrorHandlingJSObjectReference>("window.showOpenFilePicker", options);
-        int length = await helper.InvokeAsync<int>("size", jSFileHandles.JSReference);
+        IJSObjectReference jSFileHandles = await (errorHandlingJSRuntime ?? jSRuntime).InvokeAsync<IJSObjectReference>("window.showOpenFilePicker", options);
+        int length = await helper.InvokeAsync<int>("size", jSFileHandles);
 
         return await Task.WhenAll(
             Enumerable
                 .Range(0, length)
                 .Select(async i =>
-                    await this.CreateFileHandleAsync(
+                    await CreateFileHandleAsync(
                         jSRuntime,
-                        (TObjReference)(await jSFileHandles.InvokeAsync<IErrorHandlingJSObjectReference>("at", i)).JSReference,
+                        await jSFileHandles.InvokeAsync<TObjReference>("at", i),
                         fsOptions)
                 )
                 .ToArray()
