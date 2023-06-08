@@ -35,7 +35,7 @@
 
   <ItemGroup>
     <PackageReference Include="KristofferStrube.Blazor.FileSystem" Version="0.3.0" />
-    <PackageReference Include="KristofferStrube.Blazor.WebIDL" Version="0.1.0-alpha.20" />
+    <PackageReference Include="KristofferStrube.Blazor.WebIDL" Version="0.1.0-alpha.21" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.3" />
   </ItemGroup>
 

@@ -19,7 +19,11 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
 
         if (ErrorHandlingJSInterop.ErrorHandlingJSInteropHasBeenSetup)
         {
-            errorHandlingJSRuntime = new ErrorHandlingJSRuntime();
+            errorHandlingJSRuntime = new ErrorHandlingJSInProcessRuntime();
+        }
+        else if (jSRuntime is not IJSInProcessRuntime)
+        {
+            errorHandlingJSRuntime = new ErrorHandlingJSRuntime(jSRuntime);
         }
         this.jSRuntime = jSRuntime;
     }
@@ -29,7 +33,7 @@ public abstract class BaseFileSystemAccessService<TFsFileHandle, TFsDirectoryHan
     /// <inheritdoc/>
     public async Task<TFsFileHandle[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions)
     {
-        return await this.InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable());
+        return await InternalShowOpenFilePickerAsync(openFilePickerOptions?.Serializable());
     }
 
     /// <inheritdoc/>
