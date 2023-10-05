@@ -9,7 +9,7 @@ public class FilePickerAcceptType
 {
     [JsonPropertyName("description")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Description { get; set; }
+    public string? Description { get; set; } = "";
 
     [JsonPropertyName("accept")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
