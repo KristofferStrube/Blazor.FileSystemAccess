@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.1] - 2023-10-05
+### Fixed
+- Fixed to conform to change in spec where `FilePickerAcceptType.Description` now has the empty string as default value i.e. `""`.
+
 ## [3.2.0] - 2023-03-16
 ### Changed
 - Changed .NET version to `7.0`.
