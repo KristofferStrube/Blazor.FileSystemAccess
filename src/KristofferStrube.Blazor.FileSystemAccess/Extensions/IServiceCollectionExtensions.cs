@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using KristofferStrube.Blazor.WebIDL;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
@@ -13,7 +14,9 @@ public static class IServiceCollectionExtensions
     {
         ConfigureFsaOptions(serviceCollection, configure);
 
-        return serviceCollection.AddScoped<IFileSystemAccessService, FileSystemAccessService>();
+        return serviceCollection
+            .AddScoped<IFileSystemAccessService, FileSystemAccessService>()
+            .AddErrorHandlingJSRuntime();
     }
 
     public static IServiceCollection AddFileSystemAccessServiceInProcess(this IServiceCollection serviceCollection)
@@ -31,7 +34,8 @@ public static class IServiceCollectionExtensions
             {
                 IFileSystemAccessServiceInProcess service = sp.GetRequiredService<IFileSystemAccessServiceInProcess>();
                 return (IFileSystemAccessService)service;
-            });
+            })
+            .AddErrorHandlingJSRuntime();
     }
 
     private static void ConfigureFsaOptions(IServiceCollection services, Action<FileSystemAccessOptions>? configure)

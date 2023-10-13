@@ -1,10 +1,26 @@
 ﻿@page "/OpenFile"
+@using KristofferStrube.Blazor.WebIDL.Exceptions;
 @inject IFileSystemAccessServiceInProcess FileSystemAccessService
 
 <PageTitle>File System Access - Read File</PageTitle>
 
+
+@if (errorMessage is not null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
 @if (fileHandle is null)
 {
+    <p>
+        The browser can remember a set of previously used folders given an id. If a prompt has never been opened with this id then it falls back to using the well-known directory and the folder that is used this time is remembered for the next time the id is used. The id must only contain alphanumeric symbols or "_" or "-" and cannot be longer than 32 characters.
+        <br />
+        You can specify an id below here or leave it blank. You can try to give it some illegal characters or make it too long to see that we can handle errors of this type.
+        <br />
+        We can likewise detect if the user aborts the prompt which you can also test here by canceling or closing the prompt.
+    </p>
+    <label for="id">Id: </label> <input @bind="id" type="text" id="id" />
+    <br />
+    <br />
     <button @onclick="OpenFilePicker" class="btn btn-primary">Open File Picker for Single File</button>
 }
 else if (readPermissionState is PermissionState.Denied)
@@ -25,9 +41,10 @@ else
     <textarea style="width:100%;height:calc(100% - 6px);" value=@fileText @oninput=TextAreaChanged></textarea>
 }
 
-
 @code {
     private string? fileText;
+    private string? errorMessage;
+    private string? id;
     private FileSystemFileHandleInProcess? fileHandle;
     private PermissionState readPermissionState;
     private PermissionState writePermissionState;
@@ -36,18 +53,31 @@ else
     {
         try
         {
-            var options = new OpenFilePickerOptionsStartInWellKnownDirectory() { Multiple = false, StartIn = WellKnownDirectory.Downloads };
+            var options = new OpenFilePickerOptionsStartInWellKnownDirectory() { Multiple = false, StartIn = WellKnownDirectory.Downloads, Id = id };
             var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
             fileHandle = fileHandles.Single();
         }
-        catch (JSException ex)
+        catch (AbortErrorException)
         {
-            Console.WriteLine(ex);
+            errorMessage = $"The user aborted the prompt.";
+        }
+        catch (DOMException ex)
+        {
+            errorMessage = $"A user interaction error of type {ex.Name} occurred: \"{ex.Message}\"";
+        }
+        catch (TypeErrorException ex)
+        {
+            errorMessage = $"We parsed an invalid argument to the function: \"{ex.Message}\"";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Some other unexpected exception of type {ex.GetType().Name} occurred: \"{ex.Message}\"";
         }
         finally
         {
             if (fileHandle != null)
             {
+                errorMessage = null;
                 readPermissionState = await fileHandle.QueryPermissionAsync(new() { Mode = FileSystemPermissionMode.Read });
             }
         }

@@ -1,4 +1,5 @@
 using KristofferStrube.Blazor.FileSystem;
+using KristofferStrube.Blazor.WebIDL;
 using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;

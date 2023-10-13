@@ -1,6 +1,7 @@
 using KristofferStrube.Blazor.FileAPI;
 using KristofferStrube.Blazor.FileSystem;
 using KristofferStrube.Blazor.FileSystemAccess;
+using KristofferStrube.Blazor.WebIDL;
 using TG.Blazor.IndexedDB;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
