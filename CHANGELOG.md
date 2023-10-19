@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.2] - 2023-10-19
+### Changed
+- Changed the version of `Blazor.FileSystem` to use the newest version which is `0.3.1`.
+
 ## [3.2.1] - 2023-10-05
 ### Fixed
 - Fixed to conform to change in spec where `FilePickerAcceptType.Description` now has the empty string as default value i.e. `""`.
