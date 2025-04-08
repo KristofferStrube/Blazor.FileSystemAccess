@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] - 2025-04-08
+### Added
+- Added Mode option for BaseDirectoryPickerOptions. By [@datvm](https://github.com/datvm).
+
 ## [3.2.2] - 2023-10-19
 ### Changed
 - Changed the version of `Blazor.FileSystem` to use the newest version which is `0.3.1`.
