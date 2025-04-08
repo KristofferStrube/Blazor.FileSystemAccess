@@ -1,0 +1,110 @@
+﻿@page "/OpenDirectory"
+@inject IFileSystemAccessServiceInProcess FileSystemAccessService
+@inject IJSRuntime Js;
+
+<PageTitle>File System Access - Open Directory</PageTitle>
+
+@if (handler is null)
+{
+    <div class="hstack gap-3">
+        <label>
+            <input type="checkbox" @bind="write" />
+            Write permission
+        </label>
+
+        <button class="btn btn-primary" @onclick="OpenFolderAsync">Pick directory</button>
+    </div>
+}
+else
+{
+    <div class="mb-3">
+        <button class="btn btn-success" disabled="@(!write)" @onclick="WriteHelloWorldAsync">
+            <span>Create @(FileName)</span>
+
+            @if (!write)
+            {
+                <span> (no write permission)</span>
+            }
+        </button>
+    </div>
+
+    foreach (var item in items)
+    {
+        <div>
+            <span class="oi @(item.Kind == FileSystemHandleKind.Directory ? "oi-folder" : "oi-file")" aria-hidden="true"></span>
+            @(item.Name)
+        </div>
+    }
+}
+
+@code {
+    const string FileName = "HelloWorld.txt";
+
+    bool write;
+    FileSystemDirectoryHandleInProcess? handler;
+    IFileSystemHandleInProcess[] items = Array.Empty<IFileSystemHandleInProcess>();
+
+    async Task OpenFolderAsync()
+    {
+        try
+        {
+            handler = await FileSystemAccessService.ShowDirectoryPickerAsync(new DirectoryPickerOptionsStartInFileSystemHandle()
+                {
+                    Mode = write ? "readwrite" : "read",
+                });
+
+            await LoadItemsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+
+    async Task LoadItemsAsync()
+    {
+        items = await handler!.ValuesAsync();
+    }
+
+    async Task WriteHelloWorldAsync()
+    {
+        try
+        {
+            try
+            {
+                var existing = await handler!.GetFileHandleAsync(FileName, new()
+                    {
+                        Create = false,
+                    });
+
+                if (existing is not null)
+                {
+                    await Js.InvokeVoidAsync("alert", "File already exist");
+                    return;
+                }
+            }
+            catch (Exception)
+            {
+                // File does not exist
+            }
+            
+            var fileHandle = await handler!.GetFileHandleAsync(FileName, new()
+                {
+                    Create = true,
+                });
+
+            await using (var writable = await fileHandle.CreateWritableAsync())
+            {
+                await using var writer = new StreamWriter(writable);
+                await writer.WriteLineAsync("Hello world");
+            }
+
+            await LoadItemsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+
+}

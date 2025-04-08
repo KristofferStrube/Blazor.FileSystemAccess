@@ -44,6 +44,7 @@ public class DirectoryPickerOptionsStartInFileSystemHandle : BaseDirectoryPicker
 public abstract class BaseDirectoryPickerOptions
 {
     public string? Id { get; set; }
+    public string? Mode { get; set; }
 
     internal virtual ExpandoObject Serializable()
     {
@@ -51,6 +52,11 @@ public abstract class BaseDirectoryPickerOptions
         if (Id != null)
         {
             res.id = Id;
+        }
+
+        if (Mode != null)
+        {
+            res.mode = Mode;
         }
 
         return res;
