@@ -45,6 +45,12 @@ public abstract class BaseDirectoryPickerOptions
 {
     public string? Id { get; set; }
 
+    /// <summary>
+    /// <see href="https://wicg.github.io/file-system-access/#enumdef-filesystempermissionmode">FileSystemPermissionMode browser specs</see>.
+    /// The default value is <see cref="FileSystemPermissionMode.Read"/>.
+    /// </summary>
+    public FileSystemPermissionMode Mode { get; set; } = FileSystemPermissionMode.Read;
+
     internal virtual ExpandoObject Serializable()
     {
         dynamic res = new ExpandoObject();
@@ -52,6 +58,8 @@ public abstract class BaseDirectoryPickerOptions
         {
             res.id = Id;
         }
+
+        res.mode = Mode;
 
         return res;
     }
