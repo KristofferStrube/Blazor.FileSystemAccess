@@ -59,12 +59,7 @@ public abstract class BaseDirectoryPickerOptions
             res.id = Id;
         }
 
-        res.mode = Mode switch
-        {
-            FileSystemPermissionMode.Read => "read",
-            FileSystemPermissionMode.ReadWrite => "readwrite",
-            _ => throw new NotSupportedException($"Unknown Mode value: {Mode}"),
-        };
+        res.mode = Mode;
 
         return res;
     }
