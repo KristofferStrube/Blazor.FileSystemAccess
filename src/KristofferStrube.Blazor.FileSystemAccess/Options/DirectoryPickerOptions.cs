@@ -44,7 +44,7 @@ public class DirectoryPickerOptionsStartInFileSystemHandle : BaseDirectoryPicker
 public abstract class BaseDirectoryPickerOptions
 {
     public string? Id { get; set; }
-    public string? Mode { get; set; }
+    public FileSystemPermissionMode Mode { get; set; } = FileSystemPermissionMode.Read;
 
     internal virtual ExpandoObject Serializable()
     {
@@ -54,10 +54,12 @@ public abstract class BaseDirectoryPickerOptions
             res.id = Id;
         }
 
-        if (Mode != null)
+        res.mode = Mode switch
         {
-            res.mode = Mode;
-        }
+            FileSystemPermissionMode.Read => "read",
+            FileSystemPermissionMode.ReadWrite => "readwrite",
+            _ => throw new NotSupportedException($"Unknown Mode value: {Mode}"),
+        };
 
         return res;
     }

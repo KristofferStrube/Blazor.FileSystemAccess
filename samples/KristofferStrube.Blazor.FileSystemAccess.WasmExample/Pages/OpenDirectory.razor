@@ -50,7 +50,7 @@ else
         {
             handler = await FileSystemAccessService.ShowDirectoryPickerAsync(new DirectoryPickerOptionsStartInFileSystemHandle()
                 {
-                    Mode = write ? "readwrite" : "read",
+                    Mode = write ? FileSystemPermissionMode.ReadWrite : FileSystemPermissionMode.Read,
                 });
 
             await LoadItemsAsync();
@@ -79,7 +79,7 @@ else
 
                 if (existing is not null)
                 {
-                    await Js.InvokeVoidAsync("alert", "File already exist");
+                    await Js.InvokeVoidAsync("alert", "The file is already exist!");
                     return;
                 }
             }
@@ -87,7 +87,7 @@ else
             {
                 // File does not exist
             }
-            
+
             var fileHandle = await handler!.GetFileHandleAsync(FileName, new()
                 {
                     Create = true,
