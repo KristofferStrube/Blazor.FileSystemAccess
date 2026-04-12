@@ -4,7 +4,8 @@ using System.Text.Json.Serialization;
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
 /// <summary>
-/// Options common to both the open and save dialog method.
+/// Options common between <see cref="IFileSystemAccessService.ShowOpenFilePickerAsync(KristofferStrube.Blazor.FileSystemAccess.OpenFilePickerOptions?)"/>
+/// and <see cref="IFileSystemAccessService.ShowSaveFilePickerAsync(KristofferStrube.Blazor.FileSystemAccess.SaveFilePickerOptions?)"/>.
 /// </summary>
 /// <remarks><see href="https://wicg.github.io/file-system-access/#dictdef-filepickeroptions">See the API definition here</see>.</remarks>
 public abstract class FilePickerOptions
