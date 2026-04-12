@@ -1,6 +1,5 @@
 ﻿@page "/ViewZipFile"
 @using System.IO.Compression
-@using KristofferStrube.Blazor.WebIDL
 @inject IFileSystemAccessService FileSystemAccessService
 @inject IJSRuntime JSRuntime
 
@@ -105,6 +104,5 @@ else
                 CompressedLength = entry.CompressedLength,
             });
         }
-        Console.WriteLine("Done!");
     }
 }
