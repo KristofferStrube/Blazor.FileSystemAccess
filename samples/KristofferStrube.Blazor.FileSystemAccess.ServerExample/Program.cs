@@ -10,9 +10,6 @@ builder.Services.AddServerSideBlazor()
     .AddHubOptions(options =>
     {
         options.MaximumReceiveMessageSize = 1024 * 1024 * 1024;
-        options.MaximumParallelInvocationsPerClient = 1000;
-        options.EnableDetailedErrors = true;
-        options.StreamBufferCapacity = 1000;
     });
 
 builder.Services.AddScoped(sp => new HttpClient());
