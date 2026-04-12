@@ -1,5 +1,7 @@
 ﻿@page "/OpenFile"
+@using KristofferStrube.Blazor.WebIDL
 @inject IFileSystemAccessService FileSystemAccessService
+@inject IJSRuntime JSRuntime
 
 <PageTitle>File System Access - Read File</PageTitle>
 
@@ -37,7 +39,7 @@ else
     {
         try
         {
-            var options = new OpenFilePickerOptionsStartInWellKnownDirectory() { Multiple = false, StartIn = WellKnownDirectory.Downloads };
+            OpenFilePickerOptions options = new() { Multiple = false, StartIn = WellKnownDirectory.Downloads };
             var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
             fileHandle = fileHandles.Single();
         }
@@ -72,7 +74,13 @@ else
         Console.WriteLine($"File LastModified: {await file.GetLastModifiedAsync()}");
         Console.WriteLine($"File Size: {await file.GetSizeAsync()}");
         Console.WriteLine($"File Type: {await file.GetTypeAsync()}");
-        fileText = await file.TextAsync();
+        await using ReadableStream stream = await file.StreamAsync();
+        await using ReadableStreamDefaultReader reader = await stream.GetDefaultReaderAsync();
+        fileText = "";
+        await foreach (string part in reader.IterateStringsAsync())
+        {
+            fileText += part;
+        }
         writePermissionState = await fileHandle.QueryPermissionAsync(new() { Mode = FileSystemPermissionMode.ReadWrite });
     }
 

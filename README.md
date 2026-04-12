@@ -71,7 +71,7 @@ Then you can use `IFileSystemAccessService` to open one of the three dialogs ava
         FileSystemFileHandle? fileHandle = null;
         try
         {
-            OpenFilePickerOptionsStartInWellKnownDirectory options = new()
+            OpenFilePickerOptions options = new()
                 {
                     Multiple = false,
                     StartIn = WellKnownDirectory.Downloads

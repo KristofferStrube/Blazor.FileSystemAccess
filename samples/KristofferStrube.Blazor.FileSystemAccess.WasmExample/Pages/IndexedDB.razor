@@ -51,10 +51,7 @@ In this sample we store the references to files that we have previously opened i
     {
         try
         {
-            var options = new OpenFilePickerOptionsStartInWellKnownDirectory()
-                {
-                    Multiple = false
-                };
+            OpenFilePickerOptions options = new() { Multiple = false };
             var handles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
             FileHandle = handles.Single();
         }

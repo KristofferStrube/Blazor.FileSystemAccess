@@ -1,26 +1,19 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.JSInterop;
 
 namespace KristofferStrube.Blazor.FileSystemAccess.Extensions;
 
 internal static class IJSRuntimeExtensions
 {
-    internal static async Task<IJSObjectReference> GetHelperAsync(this IJSRuntime jSRuntime, FileSystemAccessOptions options)
+    private const string helperPath = "./_content/KristofferStrube.Blazor.FileSystemAccess/KristofferStrube.Blazor.FileSystemAccess.js";
+
+    internal static async Task<IJSObjectReference> GetHelperAsync(this IJSRuntime jSRuntime)
     {
-        return await GetHelperAsync<IJSObjectReference>(jSRuntime, options);
+        return await jSRuntime.InvokeAsync<IJSObjectReference>("import", helperPath);
     }
 
-    internal static async Task<IJSInProcessObjectReference> GetInProcessHelperAsync(this IJSRuntime jSRuntime, FileSystemAccessOptions options)
+    internal static async Task<IJSInProcessObjectReference> GetInProcessHelperAsync(this IJSRuntime jSRuntime)
     {
-        return await GetHelperAsync<IJSInProcessObjectReference>(jSRuntime, options);
-    }
-
-    private static async Task<T> GetHelperAsync<T>(IJSRuntime jSRuntime, FileSystemAccessOptions options)
-    {
-        return await jSRuntime.InvokeAsync<T>("import", GetScriptPath(options));
-    }
-
-    private static string GetScriptPath(FileSystemAccessOptions options)
-    {
-        return options.FullScriptPath;
+        return await jSRuntime.InvokeAsync<IJSInProcessObjectReference>("import", helperPath);
     }
 }

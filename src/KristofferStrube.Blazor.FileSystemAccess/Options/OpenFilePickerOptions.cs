@@ -1,41 +1,19 @@
-﻿using System.Dynamic;
+﻿using System.Text.Json.Serialization;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
 /// <summary>
-/// <see href="https://wicg.github.io/file-system-access/#dictdef-openfilepickeroptions">OpenFilePickerOptions browser specs</see>
+/// Options for opening a file using <see cref="IFileSystemAccessService.ShowOpenFilePickerAsync(KristofferStrube.Blazor.FileSystemAccess.OpenFilePickerOptions?)"/>
 /// </summary>
-public class OpenFilePickerOptionsStartInWellKnownDirectory : FilePickerOptionsStartInWellKnownDirectory
+/// <remarks><see href="https://wicg.github.io/file-system-access/#dictdef-openfilepickeroptions">See the API definition here</see>.</remarks>
+public class OpenFilePickerOptions : FilePickerOptions
 {
-    public bool Multiple { get; set; }
-
-    internal new ExpandoObject Serializable()
-    {
-        dynamic res = base.Serializable();
-        if (Multiple)
-        {
-            res.multiple = Multiple;
-        }
-
-        return res;
-    }
-}
-
-/// <summary>
-/// <see href="https://wicg.github.io/file-system-access/#dictdef-openfilepickeroptions">OpenFilePickerOptions browser specs</see>
-/// </summary>
-public class OpenFilePickerOptionsStartInFileSystemHandle : FilePickerOptionsStartInFileSystemHandle
-{
-    public bool Multiple { get; set; }
-
-    internal new ExpandoObject Serializable()
-    {
-        dynamic res = base.Serializable();
-        if (Multiple)
-        {
-            res.multiple = Multiple;
-        }
-
-        return res;
-    }
+    /// <summary>
+    /// Whether multiple files should be selectable.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <see langword="false"/>.
+    /// </remarks>
+    [JsonPropertyName("multiple")]
+    public bool Multiple { get; set; } = false;
 }

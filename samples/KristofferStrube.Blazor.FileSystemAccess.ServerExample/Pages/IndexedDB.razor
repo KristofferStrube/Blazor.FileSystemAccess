@@ -42,7 +42,7 @@ In this sample we store the references to files that we have previously opened i
         StoredFileHandles = (await Task.WhenAll(Enumerable
             .Range(0, length)
             .Select(async i => {
-                var fileHandle = FileSystemFileHandle.Create(JSRuntime, await entries.InvokeAsync<IJSObjectReference>("at", i));
+                var fileHandle = await FileSystemFileHandle.CreateAsync(JSRuntime, await entries.InvokeAsync<IJSObjectReference>("at", i));
                 return (false, fileHandle, await fileHandle.GetNameAsync());
             })
             )).ToList();
@@ -53,10 +53,7 @@ In this sample we store the references to files that we have previously opened i
     {
         try
         {
-            var options = new OpenFilePickerOptionsStartInWellKnownDirectory()
-                {
-                    Multiple = false
-                };
+            OpenFilePickerOptions options = new() { Multiple = false };
             var handles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
             FileHandle = handles.Single();
         }

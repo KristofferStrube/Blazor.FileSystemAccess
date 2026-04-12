@@ -1,23 +1,18 @@
 ﻿using KristofferStrube.Blazor.FileSystem;
-using Microsoft.JSInterop;
 
-namespace KristofferStrube.Blazor.FileSystemAccess
+namespace KristofferStrube.Blazor.FileSystemAccess;
+
+/// <summary>
+/// <inheritdoc cref="IFileSystemAccessService" path="/summary"/>. This service returns in-process variants for the various methods that return <see cref="FileSystemHandle"/>s.
+/// </summary>
+public interface IFileSystemAccessServiceInProcess : IFileSystemAccessService
 {
-    public interface IFileSystemAccessServiceInProcess :
-        IFileSystemAccessService<
-            FileSystemFileHandleInProcess,
-            FileSystemDirectoryHandleInProcess,
-            IJSInProcessObjectReference
-        >
-    {
-        new Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerAsync();
-        new Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInFileSystemHandle? directoryPickerOptions);
-        new Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerAsync(DirectoryPickerOptionsStartInWellKnownDirectory? directoryPickerOptions);
-        new Task<FileSystemFileHandleInProcess[]> ShowOpenFilePickerAsync();
-        new Task<FileSystemFileHandleInProcess[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInFileSystemHandle? openFilePickerOptions);
-        new Task<FileSystemFileHandleInProcess[]> ShowOpenFilePickerAsync(OpenFilePickerOptionsStartInWellKnownDirectory? openFilePickerOptions);
-        new Task<FileSystemFileHandleInProcess> ShowSaveFilePickerAsync();
-        new Task<FileSystemFileHandleInProcess> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInFileSystemHandle? saveFilePickerOptions);
-        new Task<FileSystemFileHandleInProcess> ShowSaveFilePickerAsync(SaveFilePickerOptionsStartInWellKnownDirectory? saveFilePickerOptions);
-    }
+    /// <inheritdoc cref="IFileSystemAccessService.ShowDirectoryPickerAsync(DirectoryPickerOptions?)"/>
+    public new Task<FileSystemDirectoryHandleInProcess> ShowDirectoryPickerAsync(DirectoryPickerOptions? options = null);
+
+    /// <inheritdoc cref="IFileSystemAccessService.ShowOpenFilePickerAsync(OpenFilePickerOptions?)"/>
+    public new Task<FileSystemFileHandleInProcess[]> ShowOpenFilePickerAsync(OpenFilePickerOptions? options = null);
+
+    /// <inheritdoc cref="IFileSystemAccessService.ShowSaveFilePickerAsync(SaveFilePickerOptions?)"/>
+    public new Task<FileSystemFileHandleInProcess> ShowSaveFilePickerAsync(SaveFilePickerOptions? options = null);
 }

@@ -23,7 +23,7 @@
     {
         try
         {
-            var options = new OpenFilePickerOptionsStartInWellKnownDirectory() { Multiple = true, StartIn = WellKnownDirectory.Downloads };
+            OpenFilePickerOptions options = new() { Multiple = true, StartIn = WellKnownDirectory.Downloads };
             var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
             filesRead = (await Task.WhenAll(fileHandles.Select(async x => await x.GetNameAsync()))).ToList();
         }

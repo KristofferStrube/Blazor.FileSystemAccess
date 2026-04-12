@@ -1,70 +1,42 @@
 ﻿using KristofferStrube.Blazor.FileSystem;
-using System.Dynamic;
+using System.Text.Json.Serialization;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
 /// <summary>
-/// <see href="https://wicg.github.io/file-system-access/#dictdef-filepickeroptions">FilePickerOptions browser specs</see>
+/// Options common to both the open and save dialog method.
 /// </summary>
-public class FilePickerOptionsStartInWellKnownDirectory : BaseFilePickerOptions
+/// <remarks><see href="https://wicg.github.io/file-system-access/#dictdef-filepickeroptions">See the API definition here</see>.</remarks>
+public abstract class FilePickerOptions
 {
-    public WellKnownDirectory? StartIn { get; set; }
-
-    internal override ExpandoObject Serializable()
-    {
-        dynamic res = base.Serializable();
-        if (StartIn != null)
-        {
-            res.startIn = StartIn;
-        }
-
-        return res;
-    }
-}
-
-/// <summary>
-/// <see href="https://wicg.github.io/file-system-access/#dictdef-filepickeroptions">FilePickerOptions browser specs</see>
-/// </summary>
-public class FilePickerOptionsStartInFileSystemHandle : BaseFilePickerOptions
-{
-    public FileSystemHandle? StartIn { get; set; }
-
-    internal override ExpandoObject Serializable()
-    {
-        dynamic res = base.Serializable();
-        if (StartIn != null)
-        {
-            res.startIn = StartIn;
-        }
-
-        return res;
-    }
-}
-
-public abstract class BaseFilePickerOptions
-{
+    /// <summary>
+    /// Each entry in types specifies a single user selectable option for filtering the files displayed in the file picker.
+    /// </summary>
+    [JsonPropertyName("types")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public FilePickerAcceptType[]? Types { get; set; }
-    public bool ExcludeAcceptAllOption { get; set; }
+
+    /// <summary>
+    /// By default the file picker will also include an option to not apply any filter, letting the user select any file.
+    /// Set this to <see langword="true"/> to not include this option in the file picker.
+    /// </summary>
+    [JsonPropertyName("excludeAcceptAllOption")]
+    public bool ExcludeAcceptAllOption { get; set; } = false;
+
+    /// <summary>
+    /// An id that can be used to save the directory location used for future file picks.
+    /// If the id has been used previously then the file picker will open in the last selected position.
+    /// This has less priority then <see cref="StartIn"/> if it is set to a <see cref="FileSystemHandle"/>.
+    /// </summary>
+    [JsonPropertyName("id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Id { get; set; }
 
-    internal virtual ExpandoObject Serializable()
-    {
-        dynamic res = new ExpandoObject();
-        if (Types != null)
-        {
-            res.types = Types;
-        }
-
-        if (!ExcludeAcceptAllOption)
-        {
-            res.excludeAcceptAlloption = ExcludeAcceptAllOption;
-        }
-
-        if (Id != null)
-        {
-            res.id = Id;
-        }
-
-        return res;
-    }
+    /// <summary>
+    /// Defines a <see cref="WellKnownDirectory"/> or <see cref="FileSystemHandle"/> that the file picker should start in.
+    /// If you specify a <see cref="WellKnownDirectory"/> then this has less priority than <see cref="Id"/> if the id had been used before.
+    /// </summary>
+    [JsonPropertyName("startIn")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public StartInDirectory? StartIn { get; set; }
 }
