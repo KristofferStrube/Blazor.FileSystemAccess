@@ -146,7 +146,7 @@ for (int i = 0; i < values.Count(); i++)
     var value = values[i];
     string name = await value.GetNameAsync();
     FileSystemHandleKind kind = await value.GetKindAsync();
-    Console.WriteLine($"'{name} is an {kind}'");
+    Console.WriteLine($"'{name}' is a {kind}");
     await value.DisposeAsync();
 }
 ```
@@ -157,7 +157,7 @@ await foreach (FileSystemHandle value in valuesIterator)
 {
     string name = await value.GetNameAsync();
     FileSystemHandleKind kind = await value.GetKindAsync();
-    Console.WriteLine($"'{name} is an {kind}'");
+    Console.WriteLine($"'{name}' is a {kind}");
 }
 ```
 In the above example, we pass `true` for the `disposePreviousValueWhenMovingToNextValue` parameter, which is also the default. This means that it will dispose of each handle once it iterates past it. If you need the handles after iterating, you can pass `false` for this parameter instead.
