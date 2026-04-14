@@ -7,16 +7,16 @@
 # Introduction
 A Blazor wrapper for the browser API [File System Access](https://wicg.github.io/file-system-access)
 
-The API makes it possible to read and write to your local file system from the browser both files and directories.
+The API makes it possible to read and write to your local file system from the browser, both files and directories.
 
-_Disclaimer: The API is supported on a limited set of browsers. Most noticeable not supported on Firefox, Chrome for Android, and iOS mobile browsers._
+_Disclaimer: The API is supported on a limited set of browsers. Most notably not supported on Firefox, Chrome for Android, and iOS mobile browsers._
 
 ## Demo
 The sample project can be demoed at https://kristofferstrube.github.io/Blazor.FileSystemAccess/
 
 On each page you can find the corresponding code for the example in the top right corner.
 
-On the main page you can see if the API has at least minimal support in the used browser.
+On the main page you can see if the API has at least minimal support in the browser being used.
 
 On the [Status page](https://kristofferstrube.github.io/Blazor.FileSystemAccess/Status) you can see how much of the WebIDL specs this wrapper has covered.
 
@@ -27,7 +27,7 @@ You need to install .NET 7.0 or newer to use the library.
 [Download .NET 7](https://dotnet.microsoft.com/download/dotnet/7.0)
 
 ## Installation
-You can install the package via Nuget with the Package Manager in your IDE or alternatively using the command line:
+You can install the package via NuGet with the Package Manager in your IDE or alternatively using the command line:
 ```bash
 dotnet add package KristofferStrube.Blazor.FileSystemAccess
 ```
@@ -81,7 +81,7 @@ Then you can use `IFileSystemAccessService` to open one of the three dialogs ava
         }
         catch (JSException ex)
         {
-            // Handle Exception or cancelation of File Access prompt
+            // Handle Exception or cancellation of File Access prompt
             Console.WriteLine(ex);
         }
         finally
@@ -127,16 +127,16 @@ var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options)
 ```
 
 ## Removed `FileSystemAccessOptions`
-We removed the `FileSystemAccessOptions` parameter and all methods that previously accepted it as it duplicated functionality that could be achived in other ways.
+We removed the `FileSystemAccessOptions` parameter and all methods that previously accepted it as it duplicated functionality that could be achieved in other ways.
 
 Instead of using them, you need to configure an [importmap](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap) if you want to define custom paths for loading the helper modules from this library.
 
-Blazor also has a native [ImportMap component](https://learn.microsoft.com/en-us/aspnet/core/blazor/fundamentals/static-files?view=aspnetcore-10.0#importmap-component) that that plays well with fingerprinted resources.
+Blazor also has a native [ImportMap component](https://learn.microsoft.com/en-us/aspnet/core/blazor/fundamentals/static-files?view=aspnetcore-10.0#importmap-component) that plays well with fingerprinted resources.
 
 ## Blazor.FileSystem removed `FileSystemDirectoryHandle.ValuesAsync`
 The `ValuesAsync` method was removed from Blazor.FileSystem, and instead you should now use the `ValuesAsync` extension method available from Blazor.WebIDL.
 
-This change was made to make easier to handle memory safely.
+This change was made to make it easier to handle memory safely.
 
 So if you had the following before:
 ```csharp
@@ -165,14 +165,14 @@ In the above example, we pass `true` for the `disposePreviousValueWhenMovingToNe
 # Issues
 Feel free to open issues on the repository if you find any errors with the package or have wishes for features.
 
-A known issue is that using Streams to stream large amount of data in Blazor Server is not supported.
+A known issue is that using Streams to stream large amounts of data in Blazor Server is not supported.
 
 # Related repositories
 This project uses the *Blazor.FileSystem* package to return rich `FileSystemHandle`s both `FileSystemFileHande`s and `FileSystemDirectoryHandle`s.
 - https://github.com/KristofferStrube/Blazor.FileSystem
 
 # Related articles
-This repository was build with inspiration and help from the following series of articles:
+This repository was built with inspiration and help from the following series of articles:
 
 - [Wrapping JavaScript libraries in Blazor WebAssembly/WASM](https://blog.elmah.io/wrapping-javascript-libraries-in-blazor-webassembly-wasm/)
 - [Call anonymous C# functions from JS in Blazor WASM](https://blog.elmah.io/call-anonymous-c-functions-from-js-in-blazor-wasm/)

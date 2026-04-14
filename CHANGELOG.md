@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-04-14
+### Removed
+- Removed `FilePickerOptionsStartInWellKnownDirectory` and `FilePickerOptionsStartInFileSystemHandle` and replaced their usages with the new `FilePickerOptions` class.
+- Removed `DirectoryPickerOptionsStartInWellKnownDirectory` and `DirectoryPickerOptionsStartInFileSystemHandle`. Use `DirectoryPickerOptions` instead.
+- Removed `OpenFilePickerOptionsStartInWellKnownDirectory` and `OpenFilePickerOptionsStartInFileSystemHandle`. Use `OpenFilePickerOptions` instead.
+- Removed `SaveFilePickerOptionsStartInWellKnownDirectory` and `SaveFilePickerOptionsStartInFileSystemHandle`. Use `SaveFilePickerOptions` instead.
+- Removed `FileSystemAccessOptions` as we can achieve the same by using an import map to reduce cluttered and inconsistent APIs.
+### Changed
+- Reduced number of overloads for the `ShowDirectoryPickerAsync` method in `IFileSystemAccessService` and `IFileSystemAccessServiceInProcess` to only include a single that has an optional `DirectoryPickerOptions` parameter.
+- Reduced number of overloads for the `ShowOpenFilePickerAsync` method in `IFileSystemAccessService` and `IFileSystemAccessServiceInProcess` to only include a single that has an optional `OpenFilePickerOptions` parameter.
+- Reduced number of overloads for the `ShowSaveFilePickerAsync` method in `IFileSystemAccessService` and `IFileSystemAccessServiceInProcess` to only include a single that has an optional `SaveFilePickerOptions` parameter.
+- Changed the version of `Blazor.FileSystem` to use the newest version which is `1.0.3`.
+### Added
+- Added `DirectoryPickerOptions` that encompases all the ways that we can adjust how we open a directory.
+- Added `OpenFilePickerOptions` that encompases all the ways that we can adjust how we open a file.
+- Added `SaveFilePickerOptions` that encompases all the ways that we can adjust how we save a file.
+- Added `FilePickerOptions` which better reflects the same as the WebIDL specification.
+
 ## [3.3.0] - 2025-04-08
 ### Added
 - Added Mode option for BaseDirectoryPickerOptions. By [@datvm](https://github.com/datvm).
