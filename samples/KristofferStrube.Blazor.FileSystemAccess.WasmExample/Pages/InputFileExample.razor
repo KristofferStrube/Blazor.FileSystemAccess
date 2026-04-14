@@ -1,43 +1,62 @@
 ﻿@page "/InputFileExample"
-@inject IFileSystemAccessServiceInProcess FileSystemAccessService
+@inject IFileSystemAccessService FileSystemAccessService
+@inject IJSRuntime JSRuntime
 
 <PageTitle>File System Access - InputFile Example</PageTitle>
 
 We can read the bytes from a <code>IBrowserFile</code> from the native <code>InputFile</code> component and write these to the <code>FileSystemWritableFileStream</code>.
 <br />
 <br />
+
+@if (done)
+{
+    <h3>Done streaming file</h3>
+    return;
+}
+
+@if (SaveFileHandle is null)
+{
+    <button class="btn btn-primary" @onclick=Save>Choose File to Stream To</button>
+    return;
+}
+
 @if (readFile is not null)
 {
     <h3>Currently streaming...</h3>
+    return;
 }
-else if (SaveFileHandle is not null)
-{
-    <text>Choose file to Stream From</text>
-    <br />
-    <InputFile OnChange="OnChange" />
-}
-else
-{
-    <button class="btn btn-primary" @onclick=Save>Choose File to Stream To</button>
-}
+
+<text>Choose file to Stream From</text>
+<br />
+<InputFile OnChange="OnChange" />
 
 @code {
     FileSystemFileHandle? SaveFileHandle;
     IBrowserFile? readFile;
+    bool done = false;
 
     public async Task OnChange(InputFileChangeEventArgs args)
     {
-        if (SaveFileHandle is not null)
-        {
-            readFile = args.File;
+        if (SaveFileHandle is null) return;
 
-            using var stream = readFile.OpenReadStream(maxAllowedSize: 10000000000);
-            await using var writable = await SaveFileHandle.CreateWritableAsync(new() { KeepExistingData = false });
-            await stream.CopyToAsync(writable);
-            SaveFileHandle = null;
-            readFile = null;
-            Console.WriteLine("Done streaming!");
+        readFile = args.File;
+
+        using MemoryStream tempBuffer = new();
+
+        using (var stream = readFile.OpenReadStream(maxAllowedSize: 10000000000))
+        {
+            await stream.CopyToAsync(tempBuffer);
         }
+
+        await using var writable = await SaveFileHandle.CreateWritableAsync(new() { KeepExistingData = false });
+
+        tempBuffer.Position = 0;
+        await tempBuffer.CopyToAsync(writable);
+
+        SaveFileHandle = null;
+        readFile = null;
+        Console.WriteLine("Done streaming!");
+        done = true;
     }
 
     public async Task Save()

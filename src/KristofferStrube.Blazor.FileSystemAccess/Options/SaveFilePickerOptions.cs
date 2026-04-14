@@ -1,42 +1,16 @@
-﻿using System.Dynamic;
+﻿using System.Text.Json.Serialization;
 
 namespace KristofferStrube.Blazor.FileSystemAccess;
 
 /// <summary>
-/// <see href="https://wicg.github.io/file-system-access/#dictdef-savefilepickeroptions">SaveFilePickerOptions browser specs</see>
+/// Options for opening a file using <see cref="IFileSystemAccessService.ShowSaveFilePickerAsync(SaveFilePickerOptions?)"/>
 /// </summary>
-public class SaveFilePickerOptionsStartInWellKnownDirectory : FilePickerOptionsStartInWellKnownDirectory
+/// <remarks><see href="https://wicg.github.io/file-system-access/#dictdef-savefilepickeroptions">See the API definition here</see>.</remarks>
+public class SaveFilePickerOptions : FilePickerOptions
 {
+    /// <summary>
+    /// The suggested name used for the file that is saved.
+    /// </summary>
+    [JsonPropertyName("suggestedName")]
     public string? SuggestedName { get; set; }
-
-    internal new ExpandoObject Serializable()
-    {
-        dynamic res = base.Serializable();
-        if (SuggestedName != null)
-        {
-            res.suggestedName = SuggestedName;
-        }
-
-        return res;
-    }
 }
-
-/// <summary>
-/// <see href="https://wicg.github.io/file-system-access/#dictdef-savefilepickeroptions">SaveFilePickerOptions browser specs</see>
-/// </summary>
-public class SaveFilePickerOptionsStartInFileSystemHandle : FilePickerOptionsStartInFileSystemHandle
-{
-    public string? SuggestedName { get; set; }
-
-    internal new ExpandoObject Serializable()
-    {
-        dynamic res = base.Serializable();
-        if (SuggestedName != null)
-        {
-            res.suggestedName = SuggestedName;
-        }
-
-        return res;
-    }
-}
-

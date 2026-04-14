@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>KristofferStrube.Blazor.FileSystemAccess.WasmExample</title>
+    <title>Blazor.FileSystemAccess</title>
 
     <base />
     <script type="text/javascript">
@@ -45,31 +45,36 @@
         function newJSReference() { return {}; }
         function getAttribute(object, attribute) { return object[attribute]; }
         function setAttribute(object, attribute, value) { object[attribute] = value; }
-        function toBlob(canvas, blobCallback) {
-            var blobWrapper = {};
+        function toBlob(canvas, blobCallbackRef) {
             canvas.toBlob(
-                (blob) => {
-                    blobWrapper.blob = blob;
-                    blobCallback.objRef.invokeMethodAsync('Callback');
-                },
-                quality = 1);
-            return blobWrapper;
+                (blob) => blobCallbackRef.invokeMethodAsync('Callback', DotNet.createJSObjectReference(blob)),
+                quality = 1
+            );
         }
     </script>
+    <link rel="preload" id="webassembly" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="KristofferStrube.Blazor.FileSystemAccess.WasmExample.styles.css" rel="stylesheet" />
+    <script type="importmap"></script>
+    <HeadOutlet />
 </head>
 
 <body>
-    <div id="app">Loading...</div>
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
     <script src="_content/TG.Blazor.IndexedDB/indexedDb.Blazor.js"></script>
 </body>
 

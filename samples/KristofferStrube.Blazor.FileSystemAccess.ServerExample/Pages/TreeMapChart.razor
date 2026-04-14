@@ -1,4 +1,5 @@
 ﻿@page "/TreeMapChart"
+@using KristofferStrube.Blazor.WebIDL
 @inject IFileSystemAccessService FileSystemAccessService
 
 <PageTitle>File System Access - Tree Map Chart</PageTitle>
@@ -44,7 +45,7 @@ else
     {
         try
         {
-            var options = new DirectoryPickerOptionsStartInWellKnownDirectory() { StartIn = WellKnownDirectory.Pictures };
+            DirectoryPickerOptions options = new() { StartIn = WellKnownDirectory.Pictures };
             directoryHandle = await FileSystemAccessService.ShowDirectoryPickerAsync(options);
         }
         catch (JSException ex)
@@ -63,16 +64,17 @@ else
     // Breadth First Traversal of the directories.
     private async Task BreadthFirstTraversal(FileSystemDirectoryHandle directoryHandle)
     {
-        var values = await directoryHandle.ValuesAsync();
+        await using AsyncIterator<FileSystemHandle> valuesIterator = await directoryHandle.ValuesAsync(disposePreviousValueWhenMovingToNextValue: false);
         entitiesChecked = 0;
         StateHasChanged();
         var queue = new Queue<(Entity entity, FileSystemDirectoryHandle dir, IFileSystemHandle value)>();
-        for (int i = 0; i < values.Count(); i++)
+
+        int i = 0;
+        await foreach (FileSystemHandle child in valuesIterator)
         {
-            var value = values[i];
-            var entity = new Entity(await value.GetKindAsync(), value, i);
+            var entity = new Entity(await child.GetKindAsync(), child, i++);
             rootEntity.Children.Add(entity);
-            queue.Enqueue((entity, directoryHandle, value));
+            queue.Enqueue((entity, directoryHandle, child));
             StateHasChanged();
         }
         while (queue.Count > 0)
@@ -88,8 +90,8 @@ else
             else
             {
                 var fileSystemDirectoryHandle = await dir.GetDirectoryHandleAsync(await value.GetNameAsync());
-                var innerValues = await fileSystemDirectoryHandle.ValuesAsync();
-                foreach (var innerValue in innerValues)
+                await using AsyncIterator<FileSystemHandle> innerValuesIterator = await fileSystemDirectoryHandle.ValuesAsync();
+                await foreach (var innerValue in innerValuesIterator)
                 {
                     var innerEntity = new Entity(await innerValue.GetKindAsync(), innerValue, entity.ColorIndex);
                     entity.Children.Add(innerEntity);

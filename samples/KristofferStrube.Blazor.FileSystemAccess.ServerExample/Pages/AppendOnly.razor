@@ -31,7 +31,7 @@ else
     {
         try
         {
-            var options = new OpenFilePickerOptionsStartInWellKnownDirectory() { Multiple = false, StartIn = WellKnownDirectory.Downloads };
+            OpenFilePickerOptions options = new() { Multiple = false, StartIn = WellKnownDirectory.Downloads };
             var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
             fileHandle = fileHandles.Single();
         }

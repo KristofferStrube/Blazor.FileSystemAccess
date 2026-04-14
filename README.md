@@ -71,7 +71,7 @@ Then you can use `IFileSystemAccessService` to open one of the three dialogs ava
         FileSystemFileHandle? fileHandle = null;
         try
         {
-            OpenFilePickerOptionsStartInWellKnownDirectory options = new()
+            OpenFilePickerOptions options = new()
                 {
                     Multiple = false,
                     StartIn = WellKnownDirectory.Downloads
@@ -96,6 +96,71 @@ Then you can use `IFileSystemAccessService` to open one of the three dialogs ava
     }
 }
 ```
+
+# Upgrade to version 4
+Version 4 of this library made several breaking changes. To make the transition from version 3 or earlier to this version easier, I have made a small guide below for how you can upgrade. 
+## File/Directory picker options
+We changed the method signatures for opening the directory and file picker dialogs to make them simpler to use.
+
+To migrate replace the following:
+- `OpenFilePickerOptionsStartInWellKnownDirectory` or `OpenFilePickerOptionsStartInFileSystemHandle` with `OpenFilePickerOptions`.
+- `SaveFilePickerOptionsStartInWellKnownDirectory` or `SaveFilePickerOptionsStartInFileSystemHandle` with `SaveFilePickerOptions`.
+- `DirectoryPickerOptionsStartInWellKnownDirectory` or `DirectoryPickerOptionsStartInFileSystemHandle` with `DirectoryPickerOptions`.
+
+As an example, if you had the following before:
+```csharp
+OpenFilePickerOptionsStartInWellKnownDirectory options = new() 
+    {
+        Multiple = false,
+        StartIn = WellKnownDirectory.Downloads
+    };
+var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
+```
+Update it as follows:
+```csharp
+OpenFilePickerOptions options = new() 
+    {
+        Multiple = false,
+        StartIn = WellKnownDirectory.Downloads
+    };
+var fileHandles = await FileSystemAccessService.ShowOpenFilePickerAsync(options);
+```
+
+## Removed `FileSystemAccessOptions`
+We removed the `FileSystemAccessOptions` parameter and all methods that previously accepted it as it duplicated functionality that could be achived in other ways.
+
+Instead of using them, you need to configure an [importmap](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap) if you want to define custom paths for loading the helper modules from this library.
+
+Blazor also has a native [ImportMap component](https://learn.microsoft.com/en-us/aspnet/core/blazor/fundamentals/static-files?view=aspnetcore-10.0#importmap-component) that that plays well with fingerprinted resources.
+
+## Blazor.FileSystem removed `FileSystemDirectoryHandle.ValuesAsync`
+The `ValuesAsync` method was removed from Blazor.FileSystem, and instead you should now use the `ValuesAsync` extension method available from Blazor.WebIDL.
+
+This change was made to make easier to handle memory safely.
+
+So if you had the following before:
+```csharp
+var values = await directoryHandle.ValuesAsync();
+for (int i = 0; i < values.Count(); i++)
+{
+    var value = values[i];
+    string name = await value.GetNameAsync();
+    FileSystemHandleKind kind = await value.GetKindAsync();
+    Console.WriteLine($"'{name}' is a {kind}");
+    await value.DisposeAsync();
+}
+```
+Then you should change it to the following:
+```csharp
+await using var valuesIterator = await directoryHandle.ValuesAsync(disposePreviousValueWhenMovingToNextValue: true);
+await foreach (FileSystemHandle value in valuesIterator)
+{
+    string name = await value.GetNameAsync();
+    FileSystemHandleKind kind = await value.GetKindAsync();
+    Console.WriteLine($"'{name}' is a {kind}");
+}
+```
+In the above example, we pass `true` for the `disposePreviousValueWhenMovingToNextValue` parameter, which is also the default. This means that it will dispose of each handle once it iterates past it. If you need the handles after iterating, you can pass `false` for this parameter instead.
 
 # Issues
 Feel free to open issues on the repository if you find any errors with the package or have wishes for features.

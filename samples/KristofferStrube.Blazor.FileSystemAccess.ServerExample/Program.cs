@@ -1,5 +1,4 @@
 using KristofferStrube.Blazor.FileAPI;
-using KristofferStrube.Blazor.FileSystem;
 using KristofferStrube.Blazor.FileSystemAccess;
 using TG.Blazor.IndexedDB;
 
@@ -7,12 +6,15 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+builder.Services.AddServerSideBlazor()
+    .AddHubOptions(options =>
+    {
+        options.MaximumReceiveMessageSize = 1024 * 1024 * 1024;
+    });
 
 builder.Services.AddScoped(sp => new HttpClient());
 
 builder.Services.AddFileSystemAccessService();
-builder.Services.AddStorageManagerService();
 builder.Services.AddURLService();
 
 // Adding and configuring IndexedDB used for the IndexedDB sample.

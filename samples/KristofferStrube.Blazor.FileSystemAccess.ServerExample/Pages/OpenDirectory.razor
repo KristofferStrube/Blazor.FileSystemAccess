@@ -1,6 +1,6 @@
 ﻿@page "/OpenDirectory"
 @using KristofferStrube.Blazor.WebIDL
-@inject IFileSystemAccessServiceInProcess FileSystemAccessService
+@inject IFileSystemAccessService FileSystemAccessService
 @inject IJSRuntime Js;
 
 <PageTitle>File System Access - Open Directory</PageTitle>
@@ -29,11 +29,11 @@ else
         </button>
     </div>
 
-    foreach (var item in items)
+    for (int i = 0; i < items.Count; i++)
     {
         <div>
-            <span class="oi @(item.Kind == FileSystemHandleKind.Directory ? "oi-folder" : "oi-file")" aria-hidden="true"></span>
-            @(item.Name)
+            <span class="oi @(itemKinds[i] == FileSystemHandleKind.Directory ? "oi-folder" : "oi-file")" aria-hidden="true"></span>
+            @(itemNames[i])
         </div>
     }
 }
@@ -42,8 +42,10 @@ else
     const string FileName = "HelloWorld.txt";
 
     bool write;
-    FileSystemDirectoryHandleInProcess? handler;
-    IFileSystemHandleInProcess[] items = Array.Empty<IFileSystemHandleInProcess>();
+    FileSystemDirectoryHandle? handler;
+    List<IFileSystemHandle> items = new();
+    List<FileSystemHandleKind> itemKinds = new();
+    List<string> itemNames = new();
 
     async Task OpenFolderAsync()
     {
@@ -62,16 +64,17 @@ else
 
     async Task LoadItemsAsync()
     {
-        if (items is not null)
-        {
-            foreach(var item in items)
-            {
-                await item.DisposeAsync();
-            }
-        }
+        await using AsyncIterator<string, FileSystemHandle> iterator = await handler!.EntriesAsync();
 
-        await using AsyncIterator<FileSystemHandle> valuesIterator = await handler!.ValuesAsync(disposePreviousValueWhenMovingToNextValue: false);
-        items = await valuesIterator.Select(handle => (IFileSystemHandleInProcess)handle).ToArrayAsync();
+        items.Clear();
+        itemKinds.Clear();
+        itemNames.Clear();
+        await foreach ((string name, FileSystemHandle handle) in iterator)
+        {
+            items.Add(handle);
+            itemNames.Add(name);
+            itemKinds.Add(await handle.GetKindAsync());
+        }
     }
 
     async Task WriteHelloWorldAsync()
@@ -103,7 +106,8 @@ else
 
             await using (var writable = await fileHandle.CreateWritableAsync())
             {
-                await writable.WriteAsync("Hello world");
+                await using var writer = new StreamWriter(writable);
+                await writer.WriteLineAsync("Hello world");
             }
 
             await LoadItemsAsync();

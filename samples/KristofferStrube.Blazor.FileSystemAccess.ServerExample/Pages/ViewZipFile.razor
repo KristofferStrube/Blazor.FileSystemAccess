@@ -1,6 +1,7 @@
 ﻿@page "/ViewZipFile"
 @using System.IO.Compression
 @inject IFileSystemAccessService FileSystemAccessService
+@inject IJSRuntime JSRuntime
 
 <PageTitle>File System Access - View Zip File</PageTitle>
 
@@ -47,7 +48,7 @@ else
     {
         try
         {
-            var options = new OpenFilePickerOptionsStartInWellKnownDirectory
+            OpenFilePickerOptions options = new()
             {
                 Types = new FilePickerAcceptType[]
                 {
@@ -90,9 +91,9 @@ else
         Console.WriteLine($"File Size: {await file.GetSizeAsync()}");
         Console.WriteLine($"File Type: {await file.GetTypeAsync()}");
 
-        var buffer = await file.ArrayBufferAsync();
-        using var stream = new MemoryStream(buffer);
-        using var archive = new ZipArchive(stream, ZipArchiveMode.Read, true);
+        await using ReadableStream stream = await file.StreamAsync();
+
+        using var archive = await ZipArchive.CreateAsync(stream, ZipArchiveMode.Read, true, System.Text.Encoding.ASCII);
 
         foreach (var entry in archive.Entries)
         {

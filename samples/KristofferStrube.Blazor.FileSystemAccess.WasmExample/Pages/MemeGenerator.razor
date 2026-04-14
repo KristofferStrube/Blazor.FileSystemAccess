@@ -57,7 +57,7 @@
     {
         try
         {
-            var options = new OpenFilePickerOptionsStartInWellKnownDirectory()
+            OpenFilePickerOptions options = new()
                 {
                     Types = new FilePickerAcceptType[] {
                         new FilePickerAcceptType() {
@@ -151,7 +151,7 @@
         try
         {
             var suggestedName = fileHandle is null ? "meme" : "meme_" + fileHandle.Name;
-            var options = new SaveFilePickerOptionsStartInWellKnownDirectory()
+            SaveFilePickerOptions options = new()
                 {
                     StartIn = WellKnownDirectory.Pictures,
                     SuggestedName = suggestedName
@@ -166,45 +166,36 @@
         {
             if (saveFileHandle != null && jSCanvas != null)
             {
-                var blobCallback = new BlobCallback(jSRuntime);
-                blobCallback.Callback = async (Blob blob) =>
+                var blobCallback = new BlobCallback(jSRuntime, async (Blob blob) =>
                 {
                     var writable = await saveFileHandle.CreateWritableAsync();
                     await writable.WriteAsync(blob);
                     await writable.CloseAsync();
-                };
-                await blobCallback.ToBlobAsync(jSCanvas);
+                });
+                await jSRuntime.InvokeVoidAsync("toBlob", jSCanvas, blobCallback.ObjRef);
             }
         }
     }
 
     public class BlobCallback
     {
-        private IJSObjectReference? blobWrapper;
         private IJSRuntime jSRuntime;
+        private readonly Func<Blob, Task> callback;
 
-        public BlobCallback(IJSRuntime jSRuntime)
+        public BlobCallback(IJSRuntime jSRuntime, Func<Blob, Task> callback)
         {
             this.jSRuntime = jSRuntime;
-            objRef = DotNetObjectReference.Create(this);
+            this.callback = callback;
+            ObjRef = DotNetObjectReference.Create(this);
         }
 
-        public DotNetObjectReference<BlobCallback> objRef { get; init; }
-
-        [JsonIgnore]
-        public Action<Blob>? Callback { get; set; }
+        public DotNetObjectReference<BlobCallback> ObjRef { get; init; }
 
         [JSInvokable("Callback")]
-        public async Task InvokeCallback()
+        public async Task InvokeCallback(IJSObjectReference jsBlob)
         {
-            var jSBlob = await jSRuntime.InvokeAsync<IJSObjectReference>("getAttribute", blobWrapper, "blob");
-            var blob = Blob.Create(jSRuntime, jSBlob);
-            Callback?.Invoke(blob);
-        }
-
-        public async Task ToBlobAsync(IJSObjectReference jSCanvas)
-        {
-            blobWrapper = await jSRuntime.InvokeAsync<IJSObjectReference>("toBlob", jSCanvas, this);
+            var blob = await Blob.CreateAsync(jSRuntime, jsBlob, new() { DisposesJSReference = true });
+            await callback.Invoke(blob);
         }
     }
 }
