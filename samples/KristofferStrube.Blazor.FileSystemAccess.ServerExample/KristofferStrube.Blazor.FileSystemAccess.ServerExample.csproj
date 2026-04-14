@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Blazor.Streams\src\KristofferStrube.Blazor.Streams\KristofferStrube.Blazor.Streams.csproj" />
     <ProjectReference Include="..\..\src\KristofferStrube.Blazor.FileSystemAccess\KristofferStrube.Blazor.FileSystemAccess.csproj" />
   </ItemGroup>
 
